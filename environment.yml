@@ -1,0 +1,17 @@
+name: LSTM_mt
+channels:
+  - defaults
+  - pytorch
+  - conda-forge
+dependencies:
+  - python = 3.8
+  - numpy = 1.23.1
+  - cpuonly
+  - torchvision
+  - torchaudio
+  - pytorch = 1.12.0
+  - matplotlib = 3.5.2
+  - jupyter 
+  - ipython
+  - pip
+
