@@ -14,4 +14,7 @@ dependencies:
   - jupyter 
   - ipython
   - pip
+  - pytest
+  - pip:
+      - unittest2
 
