@@ -8,7 +8,7 @@ PEOPLE = ["Laura L.", "Joram", "Dennis",
 
 TOTAL_TIME_STEPS = 21
 INPUT_SIZE = len(PEOPLE) + 1
-BATCH_SIZE = 5
+BATCH_SIZE = 2
 
 
 # Input has shape (batch size, Total time steps,  input size) #TODO: REMEMBER TO PUT BATCH FIRST
@@ -27,10 +27,12 @@ input[:,:len(TIMES),-1] = time_array
 # queries = np.random.choice(time_array, size=BATCH_SIZE, replace=True)
 queries_idx = np.random.choice(range(len(TIMES)), size=BATCH_SIZE, replace=True)
 queries = time_array[queries_idx]
-possible_query_moments = np.arange(len(TIMES)+1, TOTAL_TIME_STEPS, 1)
+possible_query_moments = np.arange(len(TIMES)+1, TOTAL_TIME_STEPS-1, 1)
 queries_moments = np.random.choice(possible_query_moments, size=BATCH_SIZE, replace=True)
 for i in range(BATCH_SIZE):
     input[i, queries_moments[i], -1] = queries[i]
 
 # create output based on queries
 output = np.zeros((BATCH_SIZE, len(PEOPLE)))  # Output is gonna be in one-hot enconding of people
+for batch_item, i in enumerate(queries_idx):
+    output[batch_item, :] = input[batch_item, i, :-1]
