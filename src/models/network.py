@@ -7,6 +7,7 @@ gamma(x; g, theta, alpha) = g * log(1+exp(alpha*(x-theta)))/alpha
 where g is the gain, theta is threshold, alpha is the softening parameter. Only the gain is learned by the LSTM. 
 """
 
+# See: https://stackoverflow.com/questions/47952930/how-can-i-use-lstm-in-pytorch-for-classification
 
 class Network(nn.Module):
     """
@@ -51,37 +52,43 @@ class Network(nn.Module):
         # initialize the hidden states for the LSTM
         hidden_lstm = {}
         af_params = {}
-        for neuron_number in range(len(PEOPLE)):
-            hidden_lstm["h_t{0}".format(neuron_number)] = torch.zeros(n_samples, self.hidden_size, dtype=torch.float32)
-            hidden_lstm["c_t{0}".format(neuron_number)] = torch.zeros(n_samples, self.hidden_size, dtype=torch.float32)
+        # TODO: maybe initialize hidden states in a separate function
+        # for neuron_number in range(len(PEOPLE)):
+        #     hidden_lstm["h_t{0}".format(neuron_number)] = torch.zeros(n_samples, self.hidden_size, dtype=torch.float32)
+        #     hidden_lstm["c_t{0}".format(neuron_number)] = torch.zeros(n_samples, self.hidden_size, dtype=torch.float32)
             # af_params["g_t{0}".format(neuron_number)] = torch.ones(n_samples)
         # initialize the parameters from the transfer function
         # g_0 = torch.ones(n_samples)
         # theta_0 = torch.ones(n_samples)
         # alpha_0 = torch.ones(n_samples)
 
-        for i in range(input.size()[1]):  # Assuming x is (batch, time_steps, input_size)
+        # for i in range(input.size()[1]):  # Assuming x is (batch, time_steps, input_size) # TODO: probably I should not have this loop
 
-            # First the input enters the neurons
-            neurons_intermediate_out = {}
-            prob_outputs = []
-            for neuron_number in range(len(PEOPLE)):
-                neurons_intermediate_out["neuron{0}".format(neuron_number)] = self.neuronsInput["neuron{0}".format(neuron_number)](input[i])
-                # then the LSTM receives the input combined by the neuron weights
-                hidden_lstm["h_t{0}".format(neuron_number)], hidden_lstm["c_t{0}".format(neuron_number)] = self.lstm(neurons_intermediate_out["neuron{0}".format(neuron_number)],
-                                                                                                                     (hidden_lstm["h_t{0}".format(neuron_number)], hidden_lstm["c_t{0}".format(neuron_number)]))
-                # then the LSTM hidden states are used to compute the parameters of the AF
-                af_params["g_t{0}".format(neuron_number)] = self.linearLSTM(hidden_lstm["h_t{0}".format(neuron_number)]).T
+        # First the input enters the neurons
+        neurons_intermediate_out = {}
+        prob_outputs = []
+        for neuron_number in range(len(PEOPLE)):
+            neurons_intermediate_out["neuron{0}".format(neuron_number)] = self.neuronsInput["neuron{0}".format(neuron_number)](input[i])
+            # then the LSTM receives the input combined by the neuron weights
+            hidden_lstm["h_t{0}".format(neuron_number)], hidden_lstm["c_t{0}".format(neuron_number)] = self.lstm(neurons_intermediate_out["neuron{0}".format(neuron_number)],
+                                                                                                                 (hidden_lstm["h_t{0}".format(neuron_number)], hidden_lstm["c_t{0}".format(neuron_number)]))
+            # then the LSTM hidden states are used to compute the parameters of the AF
+            af_params["g_t{0}".format(neuron_number)] = self.linearLSTM(hidden_lstm["h_t{0}".format(neuron_number)]).T
 
-                # then neuron intermediate outputs goes through the activation function
-                outTemp = torch.div(torch.mul(af_params["g_t{0}".format(neuron_number)], torch.log(1 + torch.exp(torch.mul(1,neurons_intermediate_out["neuron{0}".format(neuron_number)]-1)))),1)
-                #
-                output = self.neuronsOutput["neuron{0}".format(neuron_number)](outTemp)
-                prob_outputs.append(nn.functional.softmax(output))  # TODO: need to insert softmax dimension
+            # then neuron intermediate outputs goes through the activation function
+            outTemp = torch.div(torch.mul(af_params["g_t{0}".format(neuron_number)], torch.log(1 + torch.exp(torch.mul(1,neurons_intermediate_out["neuron{0}".format(neuron_number)]-1)))),1)
+            #
+            output = self.neuronsOutput["neuron{0}".format(neuron_number)](outTemp)
+            prob_outputs.append(nn.functional.softmax(output))  # TODO: need to insert softmax dimension
+
+            # TODO: THIS IMPLEMENTATION IS NOT COMPLETE, LIKE THIS I HAVE A TIME SERIES OUTPUT, BUT I WANT TO HAVE ONLY ONE TIME STEP OUTPUT AS A ONE HOT ENCODED VECTOR
+            # As you feed your sentence in word-by-word (x_i-by-x_i+1), you get an output from each timestep. You want to interpret the entire sentence to classify it.
+            # So you must wait until the LSTM has seen all the words. That is, you need to take h_t where t is the number of words in your sentence.
 
 
-            output = prob_outputs
-            outputs.append(output)
+            # output should be one number, such that prob_outputs is a list of probabilities of being each person
+            # output = prob_outputs
+            # outputs.append(output)
 
             # g.append(g_t)
             # theta.append(theta_t)

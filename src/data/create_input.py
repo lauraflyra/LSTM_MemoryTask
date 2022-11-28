@@ -33,6 +33,6 @@ for i in range(BATCH_SIZE):
     input[i, queries_moments[i], -1] = queries[i]
 
 # create output based on queries
-output = np.zeros((BATCH_SIZE, len(PEOPLE)))  # Output is gonna be in one-hot enconding of people
+output = np.zeros((BATCH_SIZE, len(PEOPLE)))  # Output is gonna be in one-hot encoding of people
 for batch_item, i in enumerate(queries_idx):
     output[batch_item, :] = input[batch_item, i, :-1]
