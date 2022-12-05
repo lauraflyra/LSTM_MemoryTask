@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from src.data.create_input import PEOPLE, INPUT_SIZE
+import numpy as np
 """
 Activation function used:
 gamma(x; g, theta, alpha) = g * log(1+exp(alpha*(x-theta)))/alpha
@@ -9,7 +10,9 @@ where g is the gain, theta is threshold, alpha is the softening parameter. Only 
 
 # See: https://stackoverflow.com/questions/47952930/how-can-i-use-lstm-in-pytorch-for-classification
 # TODO: question on output:
-# QUESTION:
+# QUESTION: So far we have time series output, should we change to only one output as the one-hot encoded person?
+# Would that make sense regarding our expectations for the behavior of the AF?
+
 
 class Network(nn.Module):
     """
@@ -48,6 +51,7 @@ class Network(nn.Module):
         :return:
         """
         n_timepoints, n_batches = input.size(0), input.size(1)
+        output = np.zeros((n_timepoints, n_batches, INPUT_SIZE))
 
         # Initialize hidden states of the LSTM for each neuron
         for neuron_number in range(INPUT_SIZE):
@@ -71,6 +75,9 @@ class Network(nn.Module):
                 out = torch.mul(g_previous, torch.log(1 + torch.exp(torch.mul(1, outLin - 1))))  # TODO: does output need reshaping?
                 self.neurons["neuron{0}".format(neuron_number)]["output"].append(out)
 
-        # TODO: need stacking of output and g?
+                output[i,:, neuron_number] = out.detach().numpy().reshape(-1,)
 
-        return self.neurons
+        # TODO: need stacking of output and g?
+        output = torch.tensor(output, requires_grad=True)
+
+        return output
