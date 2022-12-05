@@ -1,6 +1,72 @@
-from src.data.create_input import *
+from src.data.create_input import x, output
 from src.models.network import Network
 import torch
-x = torch.from_numpy(x)
-model = Network()
-model(x.float())
+import torch.nn as nn
+import scipy
+import os
+
+DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/"
+
+
+def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTraining=True,
+          saveParamsName=os.path.join(DATA_PATH, "params.mat"),
+          saveModelName=os.path.join(DATA_PATH, "model.pt"), saveLossEvery=100, saveParamsEvery=100):
+    """
+
+
+    :param dataset:
+    :param model:
+    :param n_epochs:
+    :param saveParams:
+    :param saveModel:
+    :param outputTraining:
+    :param saveParamsName:
+    :param saveModelName:
+    :param saveLossEvery:
+    :param saveParamsEvery:
+    :return:
+    """
+
+    loss_fn = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters())
+
+    x, output = dataset  # TODO: add more to the dataset if needed, like cue times or go signal info
+
+    train_error = []
+
+    store_non_linearity = {"g": [], "x": [], "output": [], "training_error": []}
+    if saveParams:
+        store_non_linearity["x"].append(x.detach().numpy())
+        store_non_linearity["output"].append(output.detach().numpy())
+
+    for epoch in range(n_epochs):
+        out_pred = model(x)
+
+        loss = loss_fn(out_pred, output)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if epoch % saveLossEvery == 0 and outputTraining:
+            print("training:", epoch, loss.item())
+            store_non_linearity["training_error"].append(loss.item())
+
+        if epoch % saveParamsEvery == 0 and saveParams:
+            store_non_linearity["g"].append(g.detach().numpy())
+
+    if saveParams:
+        scipy.io.savemat(saveParamsName, store_non_linearity)
+    if saveModel:
+        torch.save(model, saveModelName)
+
+    return
+
+
+if __name__ == "__main__":
+    dataset = (torch.from_numpy(x).float(), torch.from_numpy(output))
+    model = Network()
+    train(dataset, model, n_epochs=210, saveParams=False)
+
+    # x = torch.from_numpy(x)
+    # model = Network()
+    # model(x.float())
