@@ -1,4 +1,4 @@
-from src.data.create_input import x, output
+from src.data.create_input import create_input, create_output, create_go_signal
 from src.models.network import Network
 import torch
 import torch.nn as nn
@@ -28,7 +28,7 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
     """
 
     loss_fn = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
 
     x, output = dataset  # TODO: add more to the dataset if needed, like cue times or go signal info
 
@@ -63,9 +63,13 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
 
 
 if __name__ == "__main__":
+    x = create_input()
+    x, go_signal_idx, go_signal_moments = create_go_signal(x)
+    output = create_output(x, go_signal_idx, go_signal_moments)
+
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(output))
     model = Network()
-    train(dataset, model, n_epochs=210, saveParams=False)
+    train(dataset, model, n_epochs=1000, saveParams=False)
 
     # x = torch.from_numpy(x)
     # model = Network()

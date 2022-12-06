@@ -78,6 +78,7 @@ class Network(nn.Module):
                 output[i,:, neuron_number] = out.detach().numpy().reshape(-1,)
 
         # TODO: need stacking of output and g?
+        # TODO: does LSTM get input, outLin or a combination between input and output of that neuron?
         output = torch.tensor(output, requires_grad=True)
 
         return output
