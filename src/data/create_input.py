@@ -4,7 +4,7 @@ TIMES = np.array([9, 10, 11], dtype=int)  # daily time slots of the Prof.
 # time_array = np.linspace(0.1, 0.9, len(TIMES))  # Dont want to have neither zero nor 1
 PEOPLE = ["Laura", "Joram", "Dennis", "Felix"]
 
-TOTAL_TIME_STEPS = 7
+TOTAL_TIME_STEPS = 9
 INPUT_SIZE = len(PEOPLE) * len(TIMES)
 BATCH_SIZE = 700
 CUE_TIME = 2
@@ -29,7 +29,7 @@ def create_go_signal(x):
     batch_size = x.shape[1]
     # insert go signal
     # first we decide when the go signal is gonna happen
-    possible_go_signal_moments = np.arange(CUE_TIME + 1, TOTAL_TIME_STEPS, 1)
+    possible_go_signal_moments = np.arange(CUE_TIME + 2, TOTAL_TIME_STEPS-1, 1)
     go_signal_moments = np.random.choice(possible_go_signal_moments, size=batch_size, replace=True)
     # then we decide which time slot we want to recover
     go_signal_idx = np.random.choice(range(len(TIMES)), size=batch_size, replace=True)

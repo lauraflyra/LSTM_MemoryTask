@@ -2,7 +2,7 @@ from src.data.create_input import create_input, create_output, create_go_signal
 from src.models.network import Network
 import torch
 import torch.nn as nn
-import scipy
+import scipy.io
 import os
 
 DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/"
@@ -10,7 +10,7 @@ DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_
 
 def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTraining=True,
           saveParamsName=os.path.join(DATA_PATH, "params.mat"),
-          saveModelName=os.path.join(DATA_PATH, "model.pt"), saveLossEvery=100, saveParamsEvery=100):
+          saveModelName=os.path.join(DATA_PATH, "model.pt"), saveLossEvery=100, saveParamsEvery=400):
     """
 
 
@@ -34,13 +34,13 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
 
     train_error = []
 
-    store_non_linearity = {"g": [], "x": [], "output": [], "training_error": []}
+    store_non_linearity = {"x": [], "output": [], "training_error": []}
     if saveParams:
         store_non_linearity["x"].append(x.detach().numpy())
         store_non_linearity["output"].append(output.detach().numpy())
 
     for epoch in range(n_epochs):
-        out_pred = model(x)
+        out_pred, model_neurons = model(x)
 
         loss = loss_fn(out_pred, output)
         optimizer.zero_grad()
@@ -52,7 +52,11 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
             store_non_linearity["training_error"].append(loss.item())
 
         if epoch % saveParamsEvery == 0 and saveParams:
-            store_non_linearity["g"].append(g.detach().numpy())
+            if epoch == 0:
+                for count, neuron in enumerate(model_neurons.keys()):
+                    store_non_linearity[neuron + "-g"] = []
+            for count, neuron in enumerate(model_neurons.keys()):
+                store_non_linearity[neuron + "-g"].append(torch.stack(model_neurons[neuron]['g'][1:]).detach().numpy())
 
     if saveParams:
         scipy.io.savemat(saveParamsName, store_non_linearity)
@@ -69,7 +73,7 @@ if __name__ == "__main__":
 
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(output))
     model = Network()
-    train(dataset, model, n_epochs=1000, saveParams=False)
+    train(dataset, model, n_epochs=500, saveParams=True)
 
     # x = torch.from_numpy(x)
     # model = Network()

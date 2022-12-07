@@ -73,7 +73,7 @@ class Network(nn.Module):
                 self.neurons["neuron{0}".format(neuron_number)]["g"].append(g_t)
                 g_previous = self.neurons["neuron{0}".format(neuron_number)]["g"][i-1]
                 out = torch.mul(g_previous, torch.log(1 + torch.exp(torch.mul(1, outLin - 1))))  # TODO: does output need reshaping?
-                self.neurons["neuron{0}".format(neuron_number)]["output"].append(out)
+                # self.neurons["neuron{0}".format(neuron_number)]["output"].append(out)
 
                 output[i,:, neuron_number] = out.detach().numpy().reshape(-1,)
 
@@ -81,4 +81,4 @@ class Network(nn.Module):
         # TODO: does LSTM get input, outLin or a combination between input and output of that neuron?
         output = torch.tensor(output, requires_grad=True)
 
-        return output
+        return output, self.neurons
