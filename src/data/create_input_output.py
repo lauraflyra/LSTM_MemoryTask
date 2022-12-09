@@ -16,7 +16,7 @@ TIME_STEPS = 2 + len(TIME_SLOTS) + 7  # Starts with 2 time points zero, than sen
 BATCH_SIZE = 3
 
 x = np.zeros((TIME_STEPS, BATCH_SIZE, INPUT_DIM))
-y = np.zeros_like(x) # TODO: this is wrong. In this case input and output have different dimensions, output would only have len(PEOPLE) dimensions
+y = np.zeros((TIME_STEPS, BATCH_SIZE, len(PEOPLE)))
 
 # generate cue
 CUE_START_TIME = 2
@@ -35,12 +35,21 @@ for i in range(BATCH_SIZE):
 
 
 # generate go signal
-go_signal_moments = np.random.choice(np.arange(CUE_END_TIME+1, TIME_STEPS, 1), BATCH_SIZE, replace=True)
+go_signal_moments = np.random.choice(np.arange(CUE_END_TIME+1, TIME_STEPS-1, 1), BATCH_SIZE, replace=True)
 go_signal_time_slots = np.random.choice(len(TIME_SLOTS), BATCH_SIZE, replace=True)
 
 for i in range(BATCH_SIZE):
     x[go_signal_moments[i],i,-len(TIME_SLOTS):] = one_hot_times[go_signal_time_slots[i]]
-# TODO: create output. Time series???
+
+# generate output
+# response to the cue
+y[CUE_START_TIME:CUE_END_TIME, :,:] = x[CUE_START_TIME:CUE_END_TIME, :, :len(PEOPLE)]
+for i in range(BATCH_SIZE):
+    selected_time_slot_one_hot  = one_hot_times[go_signal_time_slots[i]]
+    x_time_columns = x[:,i,-len(TIME_SLOTS):]
+    idx_row_x = np.where(np.sum(np.array([np.equal(row, selected_time_slot_one_hot) for row in x_time_columns]), axis=1) == len(TIME_SLOTS))[0][0]
+    y[go_signal_moments[i], i, :] = x[idx_row_x, i, :len(PEOPLE)]
+
 
 
 
