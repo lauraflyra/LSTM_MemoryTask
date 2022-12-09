@@ -58,4 +58,4 @@ if __name__ == "__main__":
     x, go_signal_idx, go_signal_moments = create_go_signal(x)
     output = create_output(x, go_signal_idx, go_signal_moments)
 
-# TODO: if output is time series, we again reproduce the input patterns
+
