@@ -9,9 +9,6 @@ where g is the gain, theta is threshold, alpha is the softening parameter. Only 
 """
 
 # See: https://stackoverflow.com/questions/47952930/how-can-i-use-lstm-in-pytorch-for-classification
-# TODO: question on output:
-# QUESTION: So far we have time series output, should we change to only one output as the one-hot encoded person?
-# Would that make sense regarding our expectations for the behavior of the AF?
 
 
 class Network(nn.Module):
@@ -51,7 +48,7 @@ class Network(nn.Module):
         :return:
         """
         n_timepoints, n_batches = input.size(0), input.size(1)
-        output = np.zeros((n_timepoints, n_batches, INPUT_SIZE))
+        output = torch.zeros((n_timepoints, n_batches, INPUT_SIZE))
 
         # Initialize hidden states of the LSTM for each neuron
         for neuron_number in range(INPUT_SIZE):
@@ -65,20 +62,19 @@ class Network(nn.Module):
         for i in range(n_timepoints):
             for neuron_number in range(INPUT_SIZE):
                 outHid = self.neurons["neuron{0}".format(neuron_number)]["input2hidden"](torch.reshape(input[i,:,neuron_number],(-1,1)))
-                outLin = self.neurons["neuron{0}".format(neuron_number)]["hidden2out"](outHid)  # TODO: need to reshape?
-
+                outLin = self.neurons["neuron{0}".format(neuron_number)]["hidden2out"](outHid)
+                # TODO: insert feedback output?
                 self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(outLin,
                                                     self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"] )
-                g_t = self.linearLSTM(self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"][0])  # TODO: need slicing here?
+                g_t = self.linearLSTM(self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"][0])
                 self.neurons["neuron{0}".format(neuron_number)]["g"].append(g_t)
                 g_previous = self.neurons["neuron{0}".format(neuron_number)]["g"][i-1]
-                out = torch.mul(g_previous, torch.log(1 + torch.exp(torch.mul(1, outLin - 1))))  # TODO: does output need reshaping?
+                out = torch.mul(g_previous, torch.log(1 + torch.exp(torch.mul(1, outLin - 1))))
                 # self.neurons["neuron{0}".format(neuron_number)]["output"].append(out)
 
-                output[i,:, neuron_number] = out.detach().numpy().reshape(-1,)
+                output[i,:, neuron_number] = out.reshape(-1,)
 
-        # TODO: need stacking of output and g?
+
         # TODO: does LSTM get input, outLin or a combination between input and output of that neuron?
-        output = torch.tensor(output, requires_grad=True)
 
         return output, self.neurons
