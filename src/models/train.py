@@ -1,5 +1,5 @@
 from src.data.create_input import create_input, create_output, create_go_signal
-from src.models.network import Network
+from src.models.network_out_reccurrency import Network
 import torch
 import torch.nn as nn
 import scipy.io
@@ -10,7 +10,7 @@ DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_
 
 def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTraining=True,
           saveParamsName=os.path.join(DATA_PATH, "params.mat"),
-          saveModelName=os.path.join(DATA_PATH, "model.pt"), saveLossEvery=100, saveParamsEvery=400):
+          saveModelName=os.path.join(DATA_PATH, "model.pt"), saveLossEvery=100, saveParamsEvery=100):
     """
 
 
@@ -50,6 +50,7 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
         if epoch % saveLossEvery == 0 and outputTraining:
             print("training:", epoch, loss.item())
             store_non_linearity["training_error"].append(loss.item())
+            train_error.append(loss.item())
 
         if epoch % saveParamsEvery == 0 and saveParams:
             if epoch == 0:
@@ -63,18 +64,21 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
     if saveModel:
         torch.save(model, saveModelName)
 
-    return
+    return x, output, out_pred, train_error
 
 
 if __name__ == "__main__":
-    x = create_input()
+    x = create_input(batch_size=200)
     x, go_signal_idx, go_signal_moments = create_go_signal(x)
     output = create_output(x, go_signal_idx, go_signal_moments)
 
-    dataset = (torch.from_numpy(x).float(), torch.from_numpy(output))
+    dataset = (torch.from_numpy(x).float(), torch.from_numpy(output).float())
     model = Network()
-    train(dataset, model, n_epochs=500, saveParams=True)
-
+    x, output, out_pred, train_error = train(dataset, model, n_epochs=2000, saveParams=True)
+    from src.visualization.plot_input_output import plot_result_training
+    plot_result_training(x, output, out_pred.detach().numpy(), train_error)
     # x = torch.from_numpy(x)
     # model = Network()
     # model(x.float())
+
+# TODO: plot predicted output and check training error!!!
