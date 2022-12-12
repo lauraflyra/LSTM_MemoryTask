@@ -20,7 +20,7 @@ def plot_input(x, y):
     axs[1].set_title("output")
     plt.show()
 
-def plot_result_training(x, output, out_pred, train_error):
+def plot_result_training(x, output, out_pred, train_error, title = "title"):
     tot_time_steps, batch_size, input_size = x.shape
     which_from_batch = np.random.randint(batch_size, size=1)
     spacing = np.linspace(0, 10, input_size)
@@ -41,6 +41,8 @@ def plot_result_training(x, output, out_pred, train_error):
     axs[1].plot(time_array, out_pred_plot[:, 4:8], color='green', alpha=0.6)
     axs[1].plot(time_array, out_pred_plot[:, 8:], color='green', alpha=0.6)
     axs[1].set_title("output")
+
+    plt.suptitle(title)
     plt.show()
 
 if __name__ == "__main__":

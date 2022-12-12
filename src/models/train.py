@@ -1,5 +1,5 @@
 from src.data.create_input import create_input, create_output, create_go_signal
-from src.models.network_out_reccurrency import Network
+from src.models.network import Network
 import torch
 import torch.nn as nn
 import scipy.io
@@ -68,15 +68,15 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
 
 
 if __name__ == "__main__":
-    x = create_input(batch_size=200)
+    x = create_input(batch_size=2)
     x, go_signal_idx, go_signal_moments = create_go_signal(x)
     output = create_output(x, go_signal_idx, go_signal_moments)
 
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(output).float())
     model = Network()
-    x, output, out_pred, train_error = train(dataset, model, n_epochs=2000, saveParams=True)
+    x, output, out_pred, train_error = train(dataset, model, n_epochs=1000, saveParams=True)
     from src.visualization.plot_input_output import plot_result_training
-    plot_result_training(x, output, out_pred.detach().numpy(), train_error)
+    plot_result_training(x, output, out_pred.detach().numpy(), train_error, title="one LSTM per neuron")
     # x = torch.from_numpy(x)
     # model = Network()
     # model(x.float())
