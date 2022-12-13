@@ -36,45 +36,55 @@ class Network(nn.Module):
         self.linearLSTM = nn.Linear(self.hidden_size_LSTM, 1)       # LSTM outputs 1 parameter for the AF
 
         # create neurons
-        self.neurons = {}
+        self.neurons_input2hidden = nn.ModuleDict()
+        self.neurons_hidden2out = nn.ModuleDict()
+
+        # create dictionary to save hidden states and g for all neurons
+        self.neuron_variables = {}
+
+
         for neuron_number in range(INPUT_SIZE):
-            self.neurons["neuron{0}".format(neuron_number)] = {}
-            self.neurons["neuron{0}".format(neuron_number)]["input2hidden"] = nn.Linear(1,10)
-            self.neurons["neuron{0}".format(neuron_number)]["hidden2out"] = nn.Linear(10, 1)
+            self.neurons_input2hidden["neuron{0}".format(neuron_number)] = nn.Linear(1,10)
+            self.neurons_hidden2out["neuron{0}".format(neuron_number)] = nn.Linear(10,1)
+            self.neuron_variables["neuron{0}".format(neuron_number)] = {}
+
+
 
     def forward(self, input):
         """
         :param input:
         :return:
         """
+        ...
         n_timepoints, n_batches = input.size(0), input.size(1)
         output = torch.zeros((n_timepoints, n_batches, INPUT_SIZE))
 
-        # Initialize hidden states of the LSTM for each neuron
+        # initialize hidden states
         for neuron_number in range(INPUT_SIZE):
-            self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"] = \
+            self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = \
                 (torch.zeros(n_batches, self.hidden_size_LSTM, dtype=torch.float32),
                  torch.zeros(n_batches, self.hidden_size_LSTM, dtype=torch.float32))
             # Initialize g for all neurons, such that we can save it later
-            self.neurons["neuron{0}".format(neuron_number)]["g"] = [1]
-            self.neurons["neuron{0}".format(neuron_number)]["output"] = []
+            self.neuron_variables["neuron{0}".format(neuron_number)]["g"] = [1]
 
         for i in range(n_timepoints):
             for neuron_number in range(INPUT_SIZE):
-                outHid = self.neurons["neuron{0}".format(neuron_number)]["input2hidden"](torch.reshape(input[i,:,neuron_number],(-1,1)))
-                outLin = self.neurons["neuron{0}".format(neuron_number)]["hidden2out"](outHid)
-                # TODO: insert feedback output?
-                self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(outLin,
-                                                    self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"] )
-                g_t = self.linearLSTM(self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"][0])
-                self.neurons["neuron{0}".format(neuron_number)]["g"].append(g_t)
-                g_previous = self.neurons["neuron{0}".format(neuron_number)]["g"][i-1]
+                outHid = self.neurons_input2hidden["neuron{0}".format(neuron_number)](
+                                                    torch.reshape(input[i,:,neuron_number],(-1,1)))
+                outLin = self.neurons_hidden2out["neuron{0}".format(neuron_number)](outHid)
+
+                self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(outLin,
+                                                self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"]
+                                                                                                   )
+
+                g_t = self.linearLSTM(self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"][0])
+                self.neuron_variables["neuron{0}".format(neuron_number)]["g"].append(g_t)
+                g_previous = self.neuron_variables["neuron{0}".format(neuron_number)]["g"][i - 1]
+
                 out = torch.mul(g_previous, torch.log(1 + torch.exp(torch.mul(1, outLin - 1))))
-                # self.neurons["neuron{0}".format(neuron_number)]["output"].append(out)
 
-                output[i,:, neuron_number] = out.reshape(-1,)
+                output[i, :, neuron_number] = out.reshape(-1, )
 
 
-        # TODO: does LSTM get input, outLin or a combination between input and output of that neuron?
 
-        return output, self.neurons
+        return output, self.neuron_variables

@@ -40,7 +40,7 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
         store_non_linearity["output"].append(output.detach().numpy())
 
     for epoch in range(n_epochs):
-        out_pred, model_neurons = model(x)
+        out_pred, model_variables = model(x)
 
         loss = loss_fn(out_pred, output)
         optimizer.zero_grad()
@@ -54,10 +54,10 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
 
         if epoch % saveParamsEvery == 0 and saveParams:
             if epoch == 0:
-                for count, neuron in enumerate(model_neurons.keys()):
+                for count, neuron in enumerate(model_variables.keys()):
                     store_non_linearity[neuron + "-g"] = []
-            for count, neuron in enumerate(model_neurons.keys()):
-                store_non_linearity[neuron + "-g"].append(torch.stack(model_neurons[neuron]['g'][1:]).detach().numpy())
+            for count, neuron in enumerate(model_variables.keys()):
+                store_non_linearity[neuron + "-g"].append(torch.stack(model_variables[neuron]['g'][1:]).detach().numpy())
 
     if saveParams:
         scipy.io.savemat(saveParamsName, store_non_linearity)
@@ -68,17 +68,14 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
 
 
 if __name__ == "__main__":
-    x = create_input(batch_size=2)
+    x = create_input(batch_size=200)
     x, go_signal_idx, go_signal_moments = create_go_signal(x)
     output = create_output(x, go_signal_idx, go_signal_moments)
 
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(output).float())
     model = Network()
-    x, output, out_pred, train_error = train(dataset, model, n_epochs=1000, saveParams=True)
+    x, output, out_pred, train_error = train(dataset, model, n_epochs=500, saveParams=True)
     from src.visualization.plot_input_output import plot_result_training
-    plot_result_training(x, output, out_pred.detach().numpy(), train_error, title="one LSTM per neuron")
-    # x = torch.from_numpy(x)
-    # model = Network()
-    # model(x.float())
+    plot_result_training(x, output, out_pred.detach().numpy(), train_error, n_epochs = 500, plot_every=100,
+                                                            title="Batch size = 200, n_epochs = 500")
 
-# TODO: plot predicted output and check training error!!!
