@@ -68,7 +68,7 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
 
 
 if __name__ == "__main__":
-    x = create_input(batch_size=200)
+    x = create_input(batch_size=100)
     x, go_signal_idx, go_signal_moments = create_go_signal(x)
     output = create_output(x, go_signal_idx, go_signal_moments)
 

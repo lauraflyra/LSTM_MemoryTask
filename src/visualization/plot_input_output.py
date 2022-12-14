@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from src.data.create_input import create_input, create_output, create_go_signal
 
+
 def plot_input(x, y):
     tot_time_steps, batch_size, input_size = x.shape
     which_from_batch = np.random.randint(batch_size, size = 1)
@@ -19,6 +20,7 @@ def plot_input(x, y):
     axs[1].plot(time_array, y_plot[:, 8:], color='orange')
     axs[1].set_title("output")
     plt.show()
+
 
 def plot_result_training(x, output, out_pred, train_error, n_epochs, plot_every, title = "title"):
     tot_time_steps, batch_size, input_size = x.shape
@@ -48,6 +50,8 @@ def plot_result_training(x, output, out_pred, train_error, n_epochs, plot_every,
     plt.plot(np.linspace(plot_every, n_epochs, len(train_error[1:])),train_error[1:])
     plt.title("Training error")
     plt.show()
+
+
 if __name__ == "__main__":
     x = create_input()
     x, go_signal_idx, go_signal_moments = create_go_signal(x)
