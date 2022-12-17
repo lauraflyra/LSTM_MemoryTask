@@ -74,8 +74,11 @@ if __name__ == "__main__":
 
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(output).float())
     model = Network()
-    x, output, out_pred, train_error = train(dataset, model, n_epochs=500, saveParams=True)
+    x, output, out_pred, train_error = train(dataset, model, n_epochs=410, saveParams=True)
     from src.visualization.plot_input_output import plot_result_training
-    plot_result_training(x, output, out_pred.detach().numpy(), train_error, n_epochs = 500, plot_every=100,
-                                                            title="Batch size = 200, n_epochs = 500")
+    which_from_batch = plot_result_training(x, output, out_pred.detach().numpy(), train_error, n_epochs = 410, plot_every=100,
+                                                            title="Batch size = 100, n_epochs = 410")
 
+    from src.visualization.plot_activation_func import plot_AF_separate_neurons
+    plot_AF_separate_neurons(params_file=os.path.join(DATA_PATH, "params.mat"), go_signal_idx=go_signal_idx,
+            go_signal_moments=go_signal_moments, which_from_batch=which_from_batch)
