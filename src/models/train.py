@@ -1,5 +1,8 @@
-from src.data.create_input import create_input, create_output, create_go_signal
-from src.models.network import Network
+from src.data.create_input_output_factorial import create_input, create_output, create_go_signal
+from src.models.network_factorial import NetworkFactorial
+from src.visualization.plot_input_output import plot_result_training_factorial
+from src.visualization.plot_activation_func_factorial import plot_AF_separate_neurons
+
 import torch
 import torch.nn as nn
 import scipy.io
@@ -73,12 +76,11 @@ if __name__ == "__main__":
     output = create_output(x, go_signal_idx, go_signal_moments)
 
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(output).float())
-    model = Network()
+    model = NetworkFactorial()
     x, output, out_pred, train_error = train(dataset, model, n_epochs=410, saveParams=True)
-    from src.visualization.plot_input_output import plot_result_training
-    which_from_batch = plot_result_training(x, output, out_pred.detach().numpy(), train_error, n_epochs = 410, plot_every=100,
+
+    which_from_batch = plot_result_training_factorial(x, output, out_pred.detach().numpy(), train_error, n_epochs = 410, plot_every=100,
                                                             title="Batch size = 100, n_epochs = 410")
 
-    from src.visualization.plot_activation_func import plot_AF_separate_neurons
     plot_AF_separate_neurons(params_file=os.path.join(DATA_PATH, "params.mat"), go_signal_idx=go_signal_idx,
             go_signal_moments=go_signal_moments, which_from_batch=which_from_batch)

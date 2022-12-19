@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from src.data.create_input import PEOPLE, INPUT_SIZE
+from src.data.create_input_output_factorial import PEOPLE, INPUT_SIZE
 import numpy as np
 """
 Activation function used:
@@ -11,7 +11,7 @@ where g is the gain, theta is threshold, alpha is the softening parameter. Only 
 # See: https://stackoverflow.com/questions/47952930/how-can-i-use-lstm-in-pytorch-for-classification
 
 
-class Network(nn.Module):
+class NetworkFactorial(nn.Module):
     """
     Create a network where each neuron is has its inner chemistry represented by an LSTM.
     All neurons are the same, i.e, they have the same inner chemistry mechanisms, therefore the same LSTM.

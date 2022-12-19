@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from src.data.create_input import create_input, create_output, create_go_signal
+from src.data.create_input_output_factorial import create_input, create_output, create_go_signal
 import matplotlib.patches as mpatches
 
-def plot_input(x, y):
+def plot_input_factorial(x, y):
     tot_time_steps, batch_size, input_size = x.shape
     which_from_batch = np.random.randint(batch_size, size = 1)
     spacing = np.linspace(0,10, input_size)
@@ -22,7 +22,7 @@ def plot_input(x, y):
     plt.show()
 
 
-def plot_result_training(x, output, out_pred, train_error, n_epochs, plot_every, title = "title"):
+def plot_result_training_factorial(x, output, out_pred, train_error, n_epochs, plot_every, title = "title"):
     tot_time_steps, batch_size, input_size = x.shape
     which_from_batch = np.random.randint(batch_size, size=1)
     spacing = np.arange(0, input_size, 1)
@@ -66,6 +66,6 @@ if __name__ == "__main__":
     x = create_input()
     x, go_signal_idx, go_signal_moments = create_go_signal(x)
     output = create_output(x, go_signal_idx, go_signal_moments)
-    plot_input(x, output)
+    plot_input_factorial(x, output)
 
 

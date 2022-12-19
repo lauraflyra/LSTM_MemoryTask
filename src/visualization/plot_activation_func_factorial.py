@@ -2,7 +2,7 @@ import scipy.io as io
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from src.data.create_input import *
+from src.data.create_input_output_factorial import *
 import matplotlib.patches as mpatches
 
 DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/"
