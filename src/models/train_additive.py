@@ -1,5 +1,5 @@
 from src.data.create_input_output_additive import *
-from src.models.network_additive import Network
+from src.models.network_additive import NetworkAddtive
 import torch
 import torch.nn as nn
 
@@ -23,6 +23,6 @@ def train(dataset, n_epochs = 1000, saveLossEvery = 100):
     return x, out_pred
 
 if __name__ == "__main__":
-    model = Network()
+    model = NetworkAddtive()
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(y).float())
     train(dataset)
