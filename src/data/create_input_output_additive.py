@@ -13,10 +13,10 @@ one_hot_times = np.eye(len(TIME_SLOTS))
 # INPUT NEEDS TO BE IN SHAPE (time_steps, batch, input_size)
 
 TIME_STEPS = 2 + len(TIME_SLOTS) + 7  # Starts with 2 time points zero, than send the cues, then let the go signal come whenever
-BATCH_SIZE = 3
+BATCH_SIZE = 300
 
 x = np.zeros((TIME_STEPS, BATCH_SIZE, INPUT_DIM))
-y = np.zeros((TIME_STEPS, BATCH_SIZE, len(PEOPLE)))
+y = np.zeros((TIME_STEPS, BATCH_SIZE, len(PEOPLE)))         # Output is one hot encoding of people
 
 # generate cue
 CUE_START_TIME = 2

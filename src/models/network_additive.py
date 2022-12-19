@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from src.data.create_input_output import PEOPLE, INPUT_DIM
+from src.data.create_input_output_additive import PEOPLE, INPUT_DIM
 import numpy as np
 """
 Activation function used:
@@ -22,26 +22,31 @@ class Network(nn.Module):
     We expect the neuron to have an output in 1 hot encoding for the person that had the slot in the queried time.
     """
 
-    def __init__(self, hidden_size_LSTM=64):
-        """
-        """
+    def __init__(self, hidden_size_LSTM=64, input_lstm_dim = 1):
         super(Network, self).__init__()
 
         self.hidden_size_LSTM = hidden_size_LSTM
 
         # create the LSTM
-        self.lstm = nn.LSTMCell(input_size=1, hidden_size=self.hidden_size_LSTM)
+        self.lstm = nn.LSTMCell(input_size=input_lstm_dim, hidden_size=self.hidden_size_LSTM)
 
         # create LSTM output
-        self.linearLSTM = nn.Linear(self.hidden_size_LSTM, 1)       # LSTM outputs 1 parameter for the AF
+        self.linearLSTM = nn.Linear(self.hidden_size_LSTM, 1)  # LSTM outputs 1 parameter for the AF
 
-        # create neurons
-        self.neurons = {}
+        # create linear combination of input
+        self.linear = nn.Linear(INPUT_DIM, input_lstm_dim)
+
+        # # create neurons
+        # self.neurons_input2hidden = nn.ModuleDict()
+        # self.neurons_hidden2out = nn.ModuleDict()
+
+        # create dictionary to save hidden states and g for all neurons
+        self.neuron_variables = {}
+
         for neuron_number in range(len(PEOPLE)):
-            self.neurons["neuron{0}".format(neuron_number)] = {}
-            self.neurons["neuron{0}".format(neuron_number)]["input2hidden"] = nn.Linear(INPUT_DIM,10)
-            # TODO: does that here make sense? With INPUT_DIM??
-            self.neurons["neuron{0}".format(neuron_number)]["hidden2out"] = nn.Linear(10, 1)
+            # self.neurons_input2hidden["neuron{0}".format(neuron_number)] = nn.Linear(1, 10)
+            # self.neurons_hidden2out["neuron{0}".format(neuron_number)] = nn.Linear(10, 1)
+            self.neuron_variables["neuron{0}".format(neuron_number)] = {}
 
     def forward(self, input):
         """
@@ -53,29 +58,25 @@ class Network(nn.Module):
 
         # Initialize hidden states of the LSTM for each neuron
         for neuron_number in range(len(PEOPLE)):
-            self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"] = \
+            self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = \
                 (torch.zeros(n_batches, self.hidden_size_LSTM, dtype=torch.float32),
                  torch.zeros(n_batches, self.hidden_size_LSTM, dtype=torch.float32))
             # Initialize g for all neurons, such that we can save it later
-            self.neurons["neuron{0}".format(neuron_number)]["g"] = [1]
-            self.neurons["neuron{0}".format(neuron_number)]["output"] = []
+            self.neuron_variables["neuron{0}".format(neuron_number)]["g"] = [1]
 
         for i in range(n_timepoints):
+
+            outLin = self.linear(input[i,:,:])
+
             for neuron_number in range(len(PEOPLE)):
-                outHid = self.neurons["neuron{0}".format(neuron_number)]["input2hidden"](torch.reshape(input[i,:,:],(-1,1))) # TODO: need to change input here??
-                outLin = self.neurons["neuron{0}".format(neuron_number)]["hidden2out"](outHid)
-                # TODO: insert feedback output?
-                self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(outLin,
-                                                    self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"] )
-                g_t = self.linearLSTM(self.neurons["neuron{0}".format(neuron_number)]["hiddenLSTM"][0])
-                self.neurons["neuron{0}".format(neuron_number)]["g"].append(g_t)
-                g_previous = self.neurons["neuron{0}".format(neuron_number)]["g"][i-1]
+                self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(outLin,
+                                                    self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] )
+                g_t = self.linearLSTM(self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"][0])
+                self.neuron_variables["neuron{0}".format(neuron_number)]["g"].append(g_t)
+                g_previous = self.neuron_variables["neuron{0}".format(neuron_number)]["g"][i-1]
                 out = torch.mul(g_previous, torch.log(1 + torch.exp(torch.mul(1, outLin - 1))))
-                # self.neurons["neuron{0}".format(neuron_number)]["output"].append(out)
 
                 output[i,:, neuron_number] = out.reshape(-1,)
 
 
-        # TODO: does LSTM get input, outLin or a combination between input and output of that neuron?
-
-        return output, self.neurons
+        return output, self.neuron_variables
