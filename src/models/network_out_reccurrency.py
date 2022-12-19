@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from src.data.create_input import PEOPLE, INPUT_SIZE
+from src.data.create_input_output_factorial import PEOPLE, INPUT_SIZE
 import numpy as np
 """
 Activation function used:

@@ -25,7 +25,7 @@ class NetworkFactorial(nn.Module):
     def __init__(self, hidden_size_LSTM=64):
         """
         """
-        super(Network, self).__init__()
+        super(NetworkFactorial, self).__init__()
 
         self.hidden_size_LSTM = hidden_size_LSTM
 
