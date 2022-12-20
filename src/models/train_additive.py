@@ -1,13 +1,43 @@
-from src.data.create_input_output_additive import *
-from src.models.network_additive import NetworkAddtive
+from src.data.create_input_output_additive import create_input_go_add, create_output_add
+from src.models.network_additive import NetworkAdditive
+from src.visualization.plot_input_output import plot_result_training_additive
 import torch
 import torch.nn as nn
+import scipy.io
+import os
 
 
-def train(dataset, n_epochs = 1000, saveLossEvery = 100):
+DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/"
+
+
+def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTraining=True,
+          saveParamsName=os.path.join(DATA_PATH, "params.mat"),
+          saveModelName=os.path.join(DATA_PATH, "model.pt"), saveLossEvery=100, saveParamsEvery=100):
+    """
+    :param dataset:
+    :param model:
+    :param n_epochs:
+    :param saveParams:
+    :param saveModel:
+    :param outputTraining:
+    :param saveParamsName:
+    :param saveModelName:
+    :param saveLossEvery:
+    :param saveParamsEvery:
+    :return:
+    """
+
     loss_fn = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-    x, output = dataset
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
+
+    x, output = dataset  # TODO: add more to the dataset if needed, like cue times or go signal info
+
+    train_error = []
+
+    store_non_linearity = {"x": [], "output": [], "training_error": []}
+    if saveParams:
+        store_non_linearity["x"].append(x.detach().numpy())
+        store_non_linearity["output"].append(output.detach().numpy())
 
     for epoch in range(n_epochs):
         out_pred, model_variables = model(x)
@@ -17,12 +47,31 @@ def train(dataset, n_epochs = 1000, saveLossEvery = 100):
         loss.backward()
         optimizer.step()
 
-        if epoch % saveLossEvery == 0 :
+        if epoch % saveLossEvery == 0 and outputTraining:
             print("training:", epoch, loss.item())
+            store_non_linearity["training_error"].append(loss.item())
+            train_error.append(loss.item())
 
-    return x, out_pred
+        if epoch % saveParamsEvery == 0 and saveParams:
+            if epoch == 0:
+                for count, neuron in enumerate(model_variables.keys()):
+                    store_non_linearity[neuron + "-g"] = []
+            for count, neuron in enumerate(model_variables.keys()):
+                store_non_linearity[neuron + "-g"].append(torch.stack(model_variables[neuron]['g'][1:]).detach().numpy())
+
+    if saveParams:
+        scipy.io.savemat(saveParamsName, store_non_linearity)
+    if saveModel:
+        torch.save(model, saveModelName)
+
+    return x, output, out_pred, train_error
+
 
 if __name__ == "__main__":
-    model = NetworkAddtive()
+    x, go_signal_time_slots, go_signal_moments = create_input_go_add(batch_size=100)
+    y = create_output_add(x, go_signal_time_slots, go_signal_moments)
+    model = NetworkAdditive()
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(y).float())
-    train(dataset)
+    x, output, out_pred, train_error = train(dataset, model, n_epochs=500)
+    which_from_batch = plot_result_training_additive(x, output, out_pred.detach().numpy(), train_error, n_epochs=500,
+                                                      plot_every=100)
