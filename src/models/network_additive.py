@@ -11,7 +11,7 @@ where g is the gain, theta is threshold, alpha is the softening parameter. Only 
 # See: https://stackoverflow.com/questions/47952930/how-can-i-use-lstm-in-pytorch-for-classification
 
 
-class NetworkAddtive(nn.Module):
+class NetworkAdditive(nn.Module):
     """
     Create a network where each neuron is has its inner chemistry represented by an LSTM.
     All neurons are the same, i.e, they have the same inner chemistry mechanisms, therefore the same LSTM.
@@ -23,7 +23,7 @@ class NetworkAddtive(nn.Module):
     """
 
     def __init__(self, hidden_size_LSTM=64, input_lstm_dim = 1):
-        super(NetworkAddtive, self).__init__()
+        super(NetworkAdditive, self).__init__()
 
         self.hidden_size_LSTM = hidden_size_LSTM
 
