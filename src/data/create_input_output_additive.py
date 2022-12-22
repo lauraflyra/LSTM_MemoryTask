@@ -10,7 +10,7 @@ one_hot_times = np.eye(len(TIME_SLOTS))
 # cue for 9 am, then cue for 10 am, than cue for 11 am.
 # INPUT NEEDS TO BE IN SHAPE (time_steps, batch, input_size)
 
-TIME_STEPS = 2 + len(TIME_SLOTS) + 7  # Starts with 2 time points zero, than send the cues, then let the go signal come whenever
+TIME_STEPS = 2 + len(TIME_SLOTS) + 15  # Starts with 2 time points zero, than send the cues, then let the go signal come whenever
 BATCH_SIZE = 300
 # generate cue
 CUE_START_TIME = 2
@@ -20,7 +20,7 @@ def create_input_go_add(batch_size=BATCH_SIZE):
     # prepare input array
     x = np.zeros((TIME_STEPS, batch_size, INPUT_DIM))
     for i in range(batch_size):
-        time_slot_idx = np.random.choice(len(TIME_SLOTS), len(TIME_SLOTS), replace=False)
+        time_slot_idx = np.arange(0,len(TIME_SLOTS),1)
         people_idx = np.random.choice(len(PEOPLE), len(TIME_SLOTS), replace=True)
         cue = np.hstack((one_hot_people[people_idx], one_hot_times[time_slot_idx]))
         x[CUE_START_TIME:CUE_END_TIME, i, :] = cue
