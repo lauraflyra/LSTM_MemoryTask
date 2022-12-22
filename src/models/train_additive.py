@@ -1,6 +1,7 @@
 from src.data.create_input_output_additive import create_input_go_add, create_output_add
 from src.models.network_additive import NetworkAdditive
 from src.visualization.plot_input_output import plot_result_training_additive
+from src.visualization.plot_activation_function_additive import plot_AF_separate_neurons_add
 import torch
 import torch.nn as nn
 import scipy.io
@@ -11,7 +12,7 @@ DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_
 
 
 def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTraining=True,
-          saveParamsName=os.path.join(DATA_PATH, "params.mat"),
+          saveParamsName=os.path.join(DATA_PATH, "params_additive.mat"),
           saveModelName=os.path.join(DATA_PATH, "model.pt"), saveLossEvery=100, saveParamsEvery=100):
     """
     :param dataset:
@@ -72,6 +73,9 @@ if __name__ == "__main__":
     y = create_output_add(x, go_signal_time_slots, go_signal_moments)
     model = NetworkAdditive()
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(y).float())
-    x, output, out_pred, train_error = train(dataset, model, n_epochs=500)
-    which_from_batch = plot_result_training_additive(x, output, out_pred.detach().numpy(), train_error, n_epochs=500,
+    x, output, out_pred, train_error = train(dataset, model, n_epochs=1010)
+    which_from_batch = plot_result_training_additive(x, output, out_pred.detach().numpy(), train_error, n_epochs=1010,
                                                       plot_every=100)
+
+    plot_AF_separate_neurons_add(params_file=os.path.join(DATA_PATH, "params_additive.mat"), go_signal_time_slots=go_signal_time_slots,
+            go_signal_moments=go_signal_moments, which_from_batch=which_from_batch)
