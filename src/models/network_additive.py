@@ -34,18 +34,18 @@ class NetworkAdditive(nn.Module):
         self.linearLSTM = nn.Linear(self.hidden_size_LSTM, 1)  # LSTM outputs 1 parameter for the AF
 
         # create linear combination of input
-        self.linear = nn.Linear(INPUT_DIM, input_lstm_dim)
+        # self.linear = nn.Linear(INPUT_DIM, input_lstm_dim)
 
         # # create neurons
-        # self.neurons_input2hidden = nn.ModuleDict()
+        self.neurons_input2hidden = nn.ModuleDict()
         # self.neurons_hidden2out = nn.ModuleDict()
 
         # create dictionary to save hidden states and g for all neurons
         self.neuron_variables = {}
 
         for neuron_number in range(len(PEOPLE)):
-            # self.neurons_input2hidden["neuron{0}".format(neuron_number)] = nn.Linear(1, 10)
-            # self.neurons_hidden2out["neuron{0}".format(neuron_number)] = nn.Linear(10, 1)
+            self.neurons_input2hidden["neuron{0}".format(neuron_number)] = nn.Linear(INPUT_DIM, input_lstm_dim)
+            # self.neurons_hidden2out["neuron{0}".format(neuron_number)] = nn.Linear(10, input_lstm_dim)
             self.neuron_variables["neuron{0}".format(neuron_number)] = {}
 
     def forward(self, input):
@@ -65,10 +65,8 @@ class NetworkAdditive(nn.Module):
             self.neuron_variables["neuron{0}".format(neuron_number)]["g"] = [1]
 
         for i in range(n_timepoints):
-
-            outLin = self.linear(input[i,:,:])
-
-            for neuron_number in range(len(PEOPLE)):
+             for neuron_number in range(len(PEOPLE)):
+                outLin = self.neurons_input2hidden["neuron{0}".format(neuron_number)](input[i,:,:])
                 self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(outLin,
                                                     self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] )
                 g_t = self.linearLSTM(self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"][0])
