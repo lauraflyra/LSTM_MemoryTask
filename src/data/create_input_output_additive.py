@@ -10,7 +10,7 @@ one_hot_times = np.eye(len(TIME_SLOTS))
 # cue for 9 am, then cue for 10 am, than cue for 11 am.
 # INPUT NEEDS TO BE IN SHAPE (time_steps, batch, input_size)
 
-TIME_STEPS = 2 + len(TIME_SLOTS) + 7  # Starts with 2 time points zero, than send the cues, then let the go signal come whenever
+TIME_STEPS = 2 + len(TIME_SLOTS) + 10  # Starts with 2 time points zero, than send the cues, then let the go signal come whenever
 BATCH_SIZE = 300
 # generate cue
 CUE_START_TIME = 2
@@ -27,32 +27,31 @@ def create_input_go_add(batch_size=BATCH_SIZE):
 
 
     # generate go signal
-    go_signal_moments = np.random.choice(np.arange(CUE_END_TIME+1, TIME_STEPS-1, 1), batch_size, replace=True)
+    go_signal_moment = TIME_STEPS-1
     go_signal_time_slots = np.random.choice(len(TIME_SLOTS), batch_size, replace=True)
 
     for i in range(batch_size):
-        x[go_signal_moments[i],i,-len(TIME_SLOTS):] = one_hot_times[go_signal_time_slots[i]]
+        x[go_signal_moment,i,-len(TIME_SLOTS):] = one_hot_times[go_signal_time_slots[i]]
 
-    return x, go_signal_time_slots, go_signal_moments
+    return x, go_signal_time_slots
 
 
-def create_output_add(x, go_signal_time_slots, go_signal_moments):
+def create_output_add(x, go_signal_time_slots):
     # generate output
     # response to the cue
     batch_size = x.shape[1]
-    y = np.zeros((TIME_STEPS, batch_size, len(PEOPLE)))  # Output is one hot encoding of people
-    y[CUE_START_TIME:CUE_END_TIME, :,:] = x[CUE_START_TIME:CUE_END_TIME, :, :len(PEOPLE)]
+    y = np.zeros((batch_size,len(PEOPLE)))  # Output is one hot encoding of people
     for i in range(batch_size):
         selected_time_slot_one_hot  = one_hot_times[go_signal_time_slots[i]]
         x_time_columns = x[:,i,-len(TIME_SLOTS):]
         idx_row_x = np.where(np.sum(np.array([np.equal(row, selected_time_slot_one_hot) for row in x_time_columns]), axis=1) == len(TIME_SLOTS))[0][0]
-        y[go_signal_moments[i], i, :] = x[idx_row_x, i, :len(PEOPLE)]
+        y[i, :] = x[idx_row_x, i, :len(PEOPLE)]
 
     return y
 
 
-# if __name__ == "main":
-
-
+if __name__ == "main":
+    x, go_signal_time_slots=create_input_go_add()
+    y = create_output_add(x, go_signal_time_slots)
 
 
