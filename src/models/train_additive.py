@@ -68,10 +68,10 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
 
 
 if __name__ == "__main__":
-    x, go_signal_time_slots, go_signal_moments = create_input_go_add(batch_size=100)
-    y = create_output_add(x, go_signal_time_slots, go_signal_moments)
+    x, go_signal_time_slots = create_input_go_add(batch_size=200)
+    y = create_output_add(x, go_signal_time_slots)
     model = NetworkAdditive()
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(y).float())
-    x, output, out_pred, train_error = train(dataset, model, n_epochs=500)
-    which_from_batch = plot_result_training_additive(x, output, out_pred.detach().numpy(), train_error, n_epochs=500,
-                                                      plot_every=100)
+    x, output, out_pred, train_error = train(dataset, model, n_epochs=1000)
+    # which_from_batch = plot_result_training_additive(x, output, out_pred.detach().numpy(), train_error, n_epochs=500,
+    #                                                   plot_every=100)

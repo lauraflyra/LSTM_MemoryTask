@@ -28,7 +28,7 @@ class NetworkAdditive(nn.Module):
         self.hidden_size_LSTM = hidden_size_LSTM
 
         # create the LSTM
-        self.lstm = nn.LSTMCell(input_size=input_lstm_dim, hidden_size=self.hidden_size_LSTM)
+        self.lstm = nn.LSTM(input_size=input_lstm_dim, hidden_size=self.hidden_size_LSTM, num_layers=1)
 
         # create LSTM output
         self.linearLSTM = nn.Linear(self.hidden_size_LSTM, 1)  # LSTM outputs 1 parameter for the AF
@@ -54,29 +54,31 @@ class NetworkAdditive(nn.Module):
         :return:
         """
         n_timepoints, n_batches = input.size(0), input.size(1)
-        output = torch.zeros((n_timepoints, n_batches, len(PEOPLE)))
+        output = torch.zeros((n_batches, len(PEOPLE)))
 
         # Initialize hidden states of the LSTM for each neuron
         for neuron_number in range(len(PEOPLE)):
             self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = \
-                (torch.zeros(n_batches, self.hidden_size_LSTM, dtype=torch.float32),
-                 torch.zeros(n_batches, self.hidden_size_LSTM, dtype=torch.float32))
+                (torch.zeros(1, n_batches, self.hidden_size_LSTM, dtype=torch.float32),
+                 torch.zeros(1, n_batches, self.hidden_size_LSTM, dtype=torch.float32))
             # Initialize g for all neurons, such that we can save it later
             self.neuron_variables["neuron{0}".format(neuron_number)]["g"] = [1]
 
-        for i in range(n_timepoints):
 
-            outLin = self.linear(input[i,:,:])
+        outLin = self.linear(input)
 
-            for neuron_number in range(len(PEOPLE)):
-                self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(outLin,
-                                                    self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] )
-                g_t = self.linearLSTM(self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"][0])
-                self.neuron_variables["neuron{0}".format(neuron_number)]["g"].append(g_t)
-                g_previous = self.neuron_variables["neuron{0}".format(neuron_number)]["g"][i-1]
-                out = torch.mul(g_previous, torch.log(1 + torch.exp(torch.mul(1, outLin - 1))))
+        for neuron_number in range(len(PEOPLE)):
+            self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(outLin,
+                                                self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] )
 
-                output[i,:, neuron_number] = out.reshape(-1,)
+
+            g_neuron = self.linearLSTM(self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"][0][-1])
+            self.neuron_variables["neuron{0}".format(neuron_number)]["g"].append(g_neuron)
+            out = torch.mul(g_neuron, torch.log(1 + torch.exp(torch.mul(1, outLin[-1,:,:] - 1))))
+
+            output[:, neuron_number] = out.reshape(-1,)
+
+
 
 
         return output, self.neuron_variables
