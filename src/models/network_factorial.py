@@ -65,7 +65,7 @@ class NetworkFactorial(nn.Module):
                 (torch.zeros(n_batches, self.hidden_size_LSTM, dtype=torch.float32),
                  torch.zeros(n_batches, self.hidden_size_LSTM, dtype=torch.float32))
             # Initialize g for all neurons, such that we can save it later
-            self.neuron_variables["neuron{0}".format(neuron_number)]["g"] = [1]
+            self.neuron_variables["neuron{0}".format(neuron_number)]["g"] = (torch.ones(n_batches, 1, dtype=torch.float32))
 
         for i in range(n_timepoints):
             for neuron_number in range(INPUT_SIZE):
@@ -84,7 +84,6 @@ class NetworkFactorial(nn.Module):
                 out = torch.mul(g_previous, torch.log(1 + torch.exp(torch.mul(1, outLin - 1))))
 
                 output[i, :, neuron_number] = out.reshape(-1, )
-
 
 
         return output, self.neuron_variables
