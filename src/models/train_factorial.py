@@ -33,7 +33,7 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
 
-    x, output = dataset  # TODO: add more to the dataset if needed, like cue times or go signal info
+    x, output = dataset
 
     train_error = []
 

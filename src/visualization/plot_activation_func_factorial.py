@@ -61,8 +61,6 @@ def plot_AF_separate_neurons(params_file, go_signal_idx, go_signal_moments, whic
     data = io.loadmat(params_file, struct_as_record=False, squeeze_me = True)
     # data has keys like 'neuron0-g', 'neuron1-g'. We want to plot the non-linearities for each neurno
     n_t_samples, time_points, batch_size = data['neuron0-g'].shape
-# TODO: better would be if which from batch could be argument, so we can compare this to result form plot result training.
-#     which_from_batch = np.random.randint(batch_size, size=1)
     which_time_slot = go_signal_idx[which_from_batch]
     when_go_signal = go_signal_moments[which_from_batch]
     spacing = np.linspace(0, 20, INPUT_SIZE)
