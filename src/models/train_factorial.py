@@ -72,7 +72,7 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
 
 if __name__ == "__main__":
     # writer = SummaryWriter('runs/factorial_network_run_1')
-    x = create_input(batch_size=3)
+    x = create_input(batch_size=100)
     x, go_signal_idx, go_signal_moments = create_go_signal(x)
     output = create_output(x, go_signal_idx, go_signal_moments)
 
@@ -81,7 +81,8 @@ if __name__ == "__main__":
     # writer.add_graph(model, torch.from_numpy(x).float())
     # writer.close()
     x, output, out_pred, train_error = train(dataset, model, n_epochs=610, saveParams=True,
-                saveParamsName=os.path.join(DATA_PATH, "params_factorial_all_neurons_same_linear.mat"))
+                saveParamsName=os.path.join(DATA_PATH, "params_factorial_all_neurons_same_linear.mat"),
+                saveModelName=os.path.join(DATA_PATH, "model_factorial_all_neurons_same_linear.pt"))
 
     which_from_batch = plot_result_training_factorial(x, output, out_pred.detach().numpy(), train_error, n_epochs = 610, plot_every=100,
                                                             title="Batch size = 100, n_epochs = 610")

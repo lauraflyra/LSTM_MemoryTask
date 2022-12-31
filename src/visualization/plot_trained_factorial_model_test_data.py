@@ -6,9 +6,9 @@ from src.visualization.plot_activation_func_factorial import activation_Function
 import matplotlib.patches as mpatches
 
 
-model = torch.load("/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/model.pt")
+model = torch.load("/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/model_factorial_all_neurons_same_linear.pt")
 out_test, model_variables = model(torch.from_numpy(x_test).float())
-SAVE_DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/data_all_neurons_same_linear_factorial"
+SAVE_DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/data_all_neurons_same_linear_factorial_2"
 
 def plot_result_test_factorial(x_test, y_test, out_test):
     tot_time_steps, batch_size, input_size = x_test.shape
