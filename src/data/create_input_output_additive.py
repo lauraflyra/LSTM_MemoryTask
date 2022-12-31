@@ -10,7 +10,7 @@ one_hot_times = 0.8*np.eye(len(TIME_SLOTS))
 # cue for 9 am, then cue for 10 am, than cue for 11 am.
 # INPUT NEEDS TO BE IN SHAPE (time_steps, batch, input_size)
 
-TIME_STEPS = 2 + len(TIME_SLOTS) + 15  # Starts with 2 time points zero, than send the cues, then let the go signal come whenever
+TIME_STEPS = 2 + len(TIME_SLOTS) + 20  # Starts with 2 time points zero, than send the cues, then let the go signal come whenever
 BATCH_SIZE = 300
 # generate cue
 CUE_START_TIME = 2
