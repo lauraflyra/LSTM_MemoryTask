@@ -69,8 +69,8 @@ def plot_AF_test_separate_neurons_add(data, go_signal_time_slots, go_signal_mome
 
             neuron_g = torch.stack(data['neuron{}'.format(i)]['g'][1:]).reshape(TIME_STEPS, batch_size).detach().numpy()[:,batch]
             plt.title('batch {}, neuron {}'.format(batch,i))
-            if i == go_signal_time_slots[batch]:
-                plt.title('neuron {}; recovered times slot'.format(i))
+            # if i == go_signal_time_slots[batch]:
+            #     plt.title('neuron {}; recovered times slot'.format(i))
             for t in range(TIME_STEPS):
                 if t < CUE_START_TIME:
                     plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[t],1,1), color=colors['greys'][t])

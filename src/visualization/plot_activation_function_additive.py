@@ -33,8 +33,8 @@ def plot_AF_separate_neurons_add(params_file, go_signal_time_slots, go_signal_mo
     for i in range(len(PEOPLE)):
         neuron_g = data['neuron'+str(i)+'-g'][-1,:,which_from_batch]
         plt.title('neuron {}'.format(i))
-        if i == which_time_slot:
-            plt.title('neuron {}; recovered times slot'.format(i))
+        # if i == which_time_slot:
+        #     plt.title('neuron {}; recovered times slot'.format(i))
         for t in range(time_points):
             if t < CUE_START_TIME:
                 plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[0,t],1,1), color=colors['greys'][t])
