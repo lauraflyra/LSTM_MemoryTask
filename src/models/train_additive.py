@@ -66,7 +66,7 @@ def train(dataset, model, n_epochs, saveParams=True, saveModel=True, outputTrain
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                     'loss': loss,
-                }, os.path.join(DATA_PATH, "checkpoint_"+str(epoch)+".pt"))
+                }, os.path.join(DATA_PATH, "checkpoint_1kepochs_"+str(epoch)+".pt"))
 
     if saveParams:
         scipy.io.savemat(saveParamsName, store_non_linearity)
@@ -81,9 +81,9 @@ if __name__ == "__main__":
     y = create_output_add(x, go_signal_time_slots, go_signal_moments)
     model = NetworkAdditive()
     dataset = (torch.from_numpy(x).float(), torch.from_numpy(y).float())
-    x, output, out_pred, train_error = train(dataset, model, n_epochs=2010,
+    x, output, out_pred, train_error = train(dataset, model, n_epochs=1010,
                         saveModelName=os.path.join(DATA_PATH, "model_additive_all_neurons_separate_linear.pt"))
-    which_from_batch = plot_result_training_additive(x, output, out_pred.detach().numpy(), train_error, n_epochs=2010,
+    which_from_batch = plot_result_training_additive(x, output, out_pred.detach().numpy(), train_error, n_epochs=1010,
                                                       plot_every=100)
 
     plot_AF_separate_neurons_add(params_file=os.path.join(DATA_PATH, "params_additive.mat"), go_signal_time_slots=go_signal_time_slots,
