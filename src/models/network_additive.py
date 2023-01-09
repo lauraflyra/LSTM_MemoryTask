@@ -22,7 +22,7 @@ class NetworkAdditive(nn.Module):
     We expect the neuron to have an output in 1 hot encoding for the person that had the slot in the queried time.
     """
 
-    def __init__(self, hidden_size_LSTM=64, input_lstm_dim = 1):
+    def __init__(self, hidden_size_LSTM=64, input_lstm_dim = INPUT_DIM):
         super(NetworkAdditive, self).__init__()
 
         self.hidden_size_LSTM = hidden_size_LSTM
@@ -44,7 +44,7 @@ class NetworkAdditive(nn.Module):
         self.neuron_variables = {}
 
         for neuron_number in range(len(PEOPLE)):
-            self.neurons_input2hidden["neuron{0}".format(neuron_number)] = nn.Linear(INPUT_DIM, input_lstm_dim)
+            self.neurons_input2hidden["neuron{0}".format(neuron_number)] = nn.Linear(INPUT_DIM, 1)
             # self.neurons_hidden2out["neuron{0}".format(neuron_number)] = nn.Linear(10, input_lstm_dim)
             self.neuron_variables["neuron{0}".format(neuron_number)] = {}
 
@@ -67,7 +67,7 @@ class NetworkAdditive(nn.Module):
         for i in range(n_timepoints):
              for neuron_number in range(len(PEOPLE)):
                 outLin = self.neurons_input2hidden["neuron{0}".format(neuron_number)](input[i,:,:])
-                self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(outLin,
+                self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(input[i,:,:],
                                                     self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] )
                 g_t = self.linearLSTM(self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"][0])
                 self.neuron_variables["neuron{0}".format(neuron_number)]["g"].append(g_t)
