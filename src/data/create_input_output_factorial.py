@@ -1,6 +1,6 @@
 import numpy as np
 from src.data.common_vars import PEOPLE, TIME_SLOTS
-TOTAL_TIME_STEPS = 9
+TOTAL_TIME_STEPS = 20
 INPUT_SIZE = len(PEOPLE) * len(TIME_SLOTS)
 BATCH_SIZE = 700
 CUE_TIME = 2

@@ -8,7 +8,7 @@ import matplotlib.patches as mpatches
 
 model = torch.load("/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/model.pt")
 out_test, model_variables = model(torch.from_numpy(x_test).float())
-SAVE_DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/data_all_neurons_same_linear_factorial"
+SAVE_DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/data_all_neurons_diff_linear_factorial"
 
 def plot_result_test_factorial(x_test, y_test, out_test):
     tot_time_steps, batch_size, input_size = x_test.shape
