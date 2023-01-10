@@ -29,6 +29,8 @@ def plot_result_test_additive(x_test, y_test, out_test):
         plt.legend(by_label.values(), by_label.keys())
         plt.title("input test batch n {}".format(i))
         name = "additive_input_batch_"+str(i)+".png"
+        plt.xlabel("time points")
+        plt.ylabel("Neuron number")
         plt.savefig(os.path.join(SAVE_DATA_PATH, name))
         plt.show()
 

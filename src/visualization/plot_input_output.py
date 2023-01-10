@@ -99,6 +99,8 @@ def plot_result_training_additive(x, output, out_pred, train_error, n_epochs, pl
     by_label = dict(zip(labels, handles))
     plt.legend(by_label.values(), by_label.keys())
     plt.title("input")
+    plt.xlabel("time points")
+    plt.ylabel("Neuron number")
     plt.show()
 
     plt.plot(time_array, output_plot, color = 'blue', linewidth = 3)
@@ -151,6 +153,8 @@ def plot_result_multiple_training_additive(params_file, model_file):
         by_label = dict(zip(labels, handles))
         plt.legend(by_label.values(), by_label.keys())
         plt.title("input training random batch n {}".format(i))
+        plt.xlabel("time points")
+        plt.ylabel("Neuron number")
         name = "additive_input_random_batch_"+str(i)+".png"
         plt.savefig(os.path.join(SAVE_DATA_PATH, name))
         plt.show()
