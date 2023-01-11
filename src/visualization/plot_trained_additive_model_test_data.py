@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 from src.visualization.plot_activation_function_additive import activation_Function
 import matplotlib.patches as mpatches
 
-model = torch.load("/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/model_additive_all_neurons_separate_linear.pt")
+model = torch.load("/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/model_additive_more_dimensions_neurons.pt")
 out_test, model_variables = model(torch.from_numpy(x_test).float())
-SAVE_DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/data_all_neurons_separate_linear_additive"
+SAVE_DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/params_model_additive_more_dimensions_neurons_test"
 
 
 def plot_result_test_additive(x_test, y_test, out_test):
@@ -28,7 +28,7 @@ def plot_result_test_additive(x_test, y_test, out_test):
         by_label = dict(zip(labels, handles))
         plt.legend(by_label.values(), by_label.keys())
         plt.title("input test batch n {}".format(i))
-        name = "additive_input_batch_"+str(i)+".png"
+        name = "additive_input_batch_test_"+str(i)+".png"
         plt.xlabel("time points")
         plt.ylabel("Neuron number")
         plt.savefig(os.path.join(SAVE_DATA_PATH, name))
@@ -46,7 +46,7 @@ def plot_result_test_additive(x_test, y_test, out_test):
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = dict(zip(labels, handles))
         plt.legend(by_label.values(), by_label.keys(), loc='lower right')
-        name = "additive_output_batch_"+str(i)+".png"
+        name = "additive_output_batch_test_"+str(i)+".png"
         plt.savefig(os.path.join(SAVE_DATA_PATH, name))
         plt.show()
 
@@ -90,7 +90,7 @@ def plot_AF_test_separate_neurons_add(data, go_signal_time_slots, go_signal_mome
             plt.xlabel('z')
             plt.ylabel('gamma(z;g)')
             plt.legend(handles=[grey_patch, red_patch, green_patch], bbox_to_anchor=[0.5, 1])
-            name = "additive_activation_function_batch" + str(batch) + "neuron_" + str(i) + ".png"
+            name = "additive_activation_function_batch_test_" + str(batch) + "neuron_" + str(i) + ".png"
             plt.savefig(os.path.join(SAVE_DATA_PATH, name))
             plt.show()
 

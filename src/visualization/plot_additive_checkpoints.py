@@ -6,9 +6,9 @@ from scipy import io
 import os
 import numpy as np
 
-SAVE_DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/data_checkpoints_1kepochs_all_neurons_separate_linear_additive_random_batch"
+SAVE_DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/data_checkpoints_params_model_additive_more_dimensions_neurons"
 DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/"
-params_file = os.path.join(DATA_PATH, "params_additive.mat")
+params_file = os.path.join(DATA_PATH, "params_model_additive_more_dimensions_neurons.mat")
 
 data = io.loadmat(params_file, struct_as_record=False, squeeze_me = True)
 
