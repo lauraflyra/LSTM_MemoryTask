@@ -3,14 +3,14 @@ from src.data.common_vars import PEOPLE, TIME_SLOTS
 
 INPUT_DIM = len(PEOPLE)+len(TIME_SLOTS) # We will have one hot encoding of people and one hot encoding of times
 
-one_hot_people = np.eye(len(PEOPLE))
-one_hot_times = np.eye(len(TIME_SLOTS))
+one_hot_people = 0.8*np.eye(len(PEOPLE))
+one_hot_times = 0.8*np.eye(len(TIME_SLOTS))
 
 # input time series can be such that this time the "cue_signal" actually lasts for 3 time steps, i.e,
 # cue for 9 am, then cue for 10 am, than cue for 11 am.
 # INPUT NEEDS TO BE IN SHAPE (time_steps, batch, input_size)
 
-TIME_STEPS = 2 + len(TIME_SLOTS) + 7  # Starts with 2 time points zero, than send the cues, then let the go signal come whenever
+TIME_STEPS = 2 + len(TIME_SLOTS) + 20  # Starts with 2 time points zero, than send the cues, then let the go signal come whenever
 BATCH_SIZE = 300
 # generate cue
 CUE_START_TIME = 2
