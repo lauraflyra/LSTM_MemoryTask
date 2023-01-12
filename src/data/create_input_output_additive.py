@@ -51,8 +51,10 @@ def create_output_add(x, go_signal_time_slots, go_signal_moments):
     return y
 
 
-# if __name__ == "main":
-
+def gen_input_output(batch_size=BATCH_SIZE):
+    x, go_signal_time_slots, go_signal_moments = create_input_go_add(batch_size)
+    y = create_output_add(x, go_signal_time_slots, go_signal_moments)
+    return x, y, go_signal_time_slots, go_signal_moments
 
 
 
