@@ -3,12 +3,11 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from src.data.create_input_output_factorial import *
+from src.visualization.common_funcs import activation_Function
 import matplotlib.patches as mpatches
 
 DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/"
 
-def activation_Function(x, g, theta, alpha):
-    return g * np.log(1 + np.exp(alpha * (x - theta))) / alpha
 
 
 def plot_AF(params_file, go_signal_idx, go_signal_moments, which_from_batch):

@@ -3,13 +3,12 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from src.data.common_vars import PEOPLE
+from src.visualization.common_funcs import activation_Function
 from src.data.create_input_output_additive import *
 import matplotlib.patches as mpatches
 
 DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/"
 
-def activation_Function(x, g, theta, alpha):
-    return g * np.log(1 + np.exp(alpha * (x - theta))) / alpha
 
 def plot_AF_separate_neurons_add(params_file, go_signal_time_slots, go_signal_moments, which_from_batch):
 
