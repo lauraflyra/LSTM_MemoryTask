@@ -8,8 +8,6 @@ gamma(x; g, theta, alpha) = g * log(1+exp(alpha*(x-theta)))/alpha
 where g is the gain, theta is threshold, alpha is the softening parameter. Only the gain is learned by the LSTM. 
 """
 
-# See: https://stackoverflow.com/questions/47952930/how-can-i-use-lstm-in-pytorch-for-classification
-
 
 class NetworkFactorial(nn.Module):
     """
