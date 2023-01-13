@@ -40,7 +40,7 @@ def train(dataset,
     """
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-    store_non_linearity = {"g": [], "x": [], "y": [], "y_pred": [], "training_error": []}
+    store_non_linearity = {"x": [], "y": [], "y_pred": [], "training_error": [], "n_epochs": n_epochs}
 
     if model.__class__.__name__ == 'NetworkOneNeuron':
         x, y, cue_amp, go_start_time = dataset
@@ -69,6 +69,7 @@ def train(dataset,
         if epoch % save_loss_every == 0:
             store_non_linearity["training_error"].append(loss.item())
             store_non_linearity["y_pred"].append(y_pred.detach().numpy())
+            store_non_linearity["save_loss_every"] = save_loss_every
             if verbose:
                 print("training:", epoch, loss.item())
 
