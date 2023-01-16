@@ -6,6 +6,10 @@ import matplotlib.patches as mpatches
 
 
 
+def plot_params_af_in_time_one_neurons(params_file):
+    data = io.loadmat(params_file, struct_as_record=False, squeeze_me=True)
+    ...
+
 def plot_af_additive_neurons(params_file, which_from_batch=None):
     """
     :param params_file: file containing dictionary, created in the training process.
