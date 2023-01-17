@@ -40,7 +40,16 @@ def train(dataset,
     """
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-    store_non_linearity = {"x": [], "y": [], "y_pred": [], "training_error": [], "n_epochs": n_epochs, 'n':[], 's':[]}
+    store_non_linearity = {"x": [],
+                           "y": [],
+                           "y_pred": [],
+                           "training_error": [],
+                           "n_epochs": n_epochs,
+                           'n':[],
+                           's':[],
+                           'g': [],
+                           'theta': [],
+                           'alpha':[]}
 
     if model.__class__.__name__ == 'NetworkOneNeuronGeadah':
         x, y, cue_amp, go_start_time = dataset
@@ -48,6 +57,11 @@ def train(dataset,
         store_non_linearity["cue_amp"] = cue_amp
 
     elif model.__class__.__name__ == 'NetworkOneNeuron':
+        x, y, cue_amp, go_start_time = dataset
+        store_non_linearity["go_start_time"] = go_start_time
+        store_non_linearity["cue_amp"] = cue_amp
+
+    elif model.__class__.__name__ == 'NetworkOneNeuronLearnAll':
         x, y, cue_amp, go_start_time = dataset
         store_non_linearity["go_start_time"] = go_start_time
         store_non_linearity["cue_amp"] = cue_amp
@@ -81,9 +95,13 @@ def train(dataset,
         if epoch % save_params_every == 0 and save_params:
             if model.__class__.__name__ == 'NetworkOneNeuron':
                 store_non_linearity["g"].append(model_variables.detach().numpy())
-            if model.__class__.__name__ == 'NetworkOneNeuronGeadah':
+            elif model.__class__.__name__ == 'NetworkOneNeuronGeadah':
                 store_non_linearity["n"].append(model_variables[0].detach().numpy())
                 store_non_linearity["s"].append(model_variables[1].detach().numpy())
+            elif model.__class__.__name__ == 'NetworkOneNeuronLearnAll':
+                store_non_linearity["g"].append(model_variables[0].detach().numpy())
+                store_non_linearity["theta"].append(model_variables[1].detach().numpy())
+                store_non_linearity["alpha"].append(model_variables[1].detach().numpy())
             else:
                 if epoch == 0:
                     for count, neuron in enumerate(model_variables.keys()):
