@@ -8,7 +8,7 @@ import matplotlib.colors as mcolors
 
 
 
-def plot_result_training_one_neuron_Geadah(params_file):
+def plot_result_training_one_neuron(params_file):
 
     data = io.loadmat(params_file, struct_as_record=False, squeeze_me=True)
     x = data['x']
