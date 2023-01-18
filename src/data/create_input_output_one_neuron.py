@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 
 L = 85  # length of each sample
 DIM = 1  # input size - number of neurons
-BATCH_SIZE = 2000
+BATCH_SIZE = 100
 
 CUE_START_TIME = 5
-CUE_DURATION = 20
+CUE_DURATION = 1
 CUE_END_TIME = CUE_START_TIME + CUE_DURATION
 CUE_HEIGHT = 0.8
 
-GO_DURATION = 5
+GO_DURATION = 1
 GO_AMP = 0.6  # amplitude of the go signal
 
 
@@ -26,7 +26,7 @@ def gen_input_output(batch_size = BATCH_SIZE):
     GO_START_TIME = np.random.randint(CUE_END_TIME + 1, high=int(L - CUE_DURATION - GO_DURATION), size=batch_size)
     GO_END_TIME = GO_START_TIME + GO_DURATION
 
-    OUTPUT_RESPONSE_START = GO_END_TIME
+    OUTPUT_RESPONSE_START = GO_START_TIME
     OUTPUT_RESPONSE_END = OUTPUT_RESPONSE_START + CUE_DURATION
 
     # INPUT NEEDS TO BE IN SHAPE (time_steps, batch, input_size)
