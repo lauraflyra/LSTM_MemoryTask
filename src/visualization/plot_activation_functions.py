@@ -5,6 +5,12 @@ from src.visualization.common_funcs import activation_Function
 from src.data.create_input_output_additive import *
 import matplotlib.patches as mpatches
 
+"""
+Plotting activation functions. Plots for AF in time mean that for every given time step, 
+we have the plot of one AF function. Colors indicate time step. 
+"""
+
+
 def geadah_activation_function(x, n, s):
     first_factor =  (1 - s)*(np.log(1+np.exp(n*x)))/n
     second_factor = s*(np.exp(n*x)/(1+np.exp(n*x)))
@@ -24,12 +30,6 @@ def plot_params_af_in_time_one_neuron(params_file):
     from src.data.create_input_output_one_neuron import CUE_START_TIME, CUE_END_TIME, CUE_DURATION, GO_DURATION
 
     GO_START_TIME = data["go_start_time"]
-
-    colors = {
-        'greys': plt.cm.Greys(np.linspace(0.1, 1, int(time_points))),
-        'reds': plt.cm.Reds(np.linspace(0.5, 1, GO_DURATION)),
-        'greens': plt.cm.Greens(np.linspace(0.1, 1, CUE_DURATION)),
-        'purples': plt.cm.Purples(np.linspace(0.1, 1, CUE_DURATION + 1)), }
 
     gs = data['g'][-1, :, which_plots]
 
@@ -59,45 +59,64 @@ def plot_params_af_in_time_one_neuron(params_file):
     OUT_START_2 = OUTPUT_RESPONSE_START[which_plots[1]]
     OUT_END_2 = OUTPUT_RESPONSE_END[which_plots[1]]
 
+    colors = {
+        'greys': plt.cm.Greys(np.linspace(0.1, 1, int(time_points))),
+        'reds': plt.cm.Reds(np.linspace(0.7, 1, GO_DURATION)),
+        'greens': plt.cm.Greens(np.linspace(0.7, 1, CUE_DURATION)),
+        'purples': plt.cm.Purples(np.linspace(0.7, 1, CUE_DURATION + 1)),
+        'oranges': plt.cm.Oranges(np.linspace(0.1, 1, max(GO_START_2, GO_START_1) - CUE_END_TIME))}
+
+
     for t in range(time_points):
         if t > 0:
-            axs[0, 1].plot(z, activation_Function(z, gs[0, t], 1,1), color=colors['greys'][t])
-            axs[1, 1].plot(z, activation_Function(z, gs[1, t], 1,1), color=colors['greys'][t])
+            axs[0, 1].plot(z, activation_Function(z, gs[0, t], 1,1), color=colors['greys'][t], alpha = 0.2)
+            axs[1, 1].plot(z, activation_Function(z, gs[1, t], 1,1), color=colors['greys'][t], alpha = 0.2)
 
-        if CUE_START_TIME < t < CUE_END_TIME:
+        if CUE_END_TIME < t < (GO_START_1-1):
+            axs[0, 1].plot(z, activation_Function(z, gs[0, t], 1, 1),
+                           color=colors['oranges'][t - CUE_END_TIME], linewidth=4)
+            axs[0, 0].scatter(t, data['x'][t, which_plots[0]], color=colors['oranges'][t - CUE_END_TIME], linewidth=7, alpha = 0.7)
+        if CUE_END_TIME < t < (GO_START_2-1):
+            axs[1, 1].plot(z, activation_Function(z, gs[1, t], 1,1),
+                           color=colors['oranges'][t - CUE_END_TIME], linewidth=4)
+            axs[1, 0].scatter(t, data['x'][t, which_plots[1]], color=colors['oranges'][t - CUE_END_TIME], linewidth=7, alpha = 0.7)
+
+
+        if CUE_START_TIME <= t < CUE_END_TIME:
             axs[0, 1].plot(z, activation_Function(z, gs[0, t], 1,1),
                            color=colors['purples'][t - CUE_START_TIME], linewidth=4)
             axs[1, 1].plot(z, activation_Function(z, gs[1, t], 1,1),
                            color=colors['purples'][t - CUE_START_TIME], linewidth=4)
-            axs[0, 0].scatter(t, data['x'][t, which_plots[0]], color=colors['purples'][t - CUE_START_TIME], linewidth=4)
-            axs[1, 0].scatter(t, data['x'][t, which_plots[1]], color=colors['purples'][t - CUE_START_TIME], linewidth=4)
+            axs[0, 0].scatter(t, data['x'][t, which_plots[0]], color=colors['purples'][t - CUE_START_TIME], linewidth=10)
+            axs[1, 0].scatter(t, data['x'][t, which_plots[1]], color=colors['purples'][t - CUE_START_TIME], linewidth=10)
 
+        # if GO_START_1 <= t < GO_END_1:
+        #     axs[0, 1].plot(z, activation_Function(z, gs[0, t], 1,1),
+        #                    color=colors['reds'][t - GO_START_1], linewidth=4, alpha = 0.7)
+        #     axs[0, 0].scatter(t, data['x'][t, which_plots[0]], color=colors['reds'][t - GO_START_1], linewidth=8, alpha = 0.7)
+        #
+        # if GO_START_2 <= t < GO_END_2:
+        #     axs[1, 1].plot(z, activation_Function(z, gs[1, t], 1,1),
+        #                    color=colors['reds'][t - GO_START_2], linewidth=4, alpha = 0.7)
+        #     axs[1, 0].scatter(t, data['x'][t, which_plots[1]], color=colors['reds'][t - GO_START_2], linewidth=8, alpha = 0.7)
+
+        if OUT_START_2 <= t < OUT_END_2:
+            axs[1, 1].plot(z, activation_Function(z, gs[1, t], 1, 1),
+                           color=colors['greens'][t - OUT_START_2], linewidth=3)
+            axs[1, 0].scatter(t, data['x'][t, which_plots[1]], color=colors['greens'][t - OUT_START_2],
+                              linewidth=12)
         if OUT_START_1 <= t < OUT_END_1:
             axs[0, 1].plot(z, activation_Function(z, gs[0, t], 1,1),
                            color=colors['greens'][t - OUT_END_1], linewidth=3)
-            axs[0, 0].scatter(t, data['x'][t, which_plots[0]], color=colors['greens'][t - OUT_END_1], linewidth=10)
-
-        if OUT_START_2 <= t < OUT_END_2:
-            axs[1, 1].plot(z, activation_Function(z, gs[1, t], 1,1),
-                           color=colors['greens'][t - OUT_START_2], linewidth=3)
-            axs[1, 0].scatter(t, data['x'][t, which_plots[1]], color=colors['greens'][t - OUT_START_2], linewidth=10)
-
-        if GO_START_1 <= t < GO_END_1:
-            axs[0, 1].plot(z, activation_Function(z, gs[0, t], 1,1),
-                           color=colors['reds'][t - GO_START_1], linewidth=4)
-            axs[0, 0].scatter(t, data['x'][t, which_plots[0]], color=colors['reds'][t - GO_START_1], linewidth=10)
-
-        if GO_START_2 <= t < GO_END_2:
-            axs[1, 1].plot(z, activation_Function(z, gs[1, t], 1,1),
-                           color=colors['reds'][t - GO_START_2], linewidth=4)
-            axs[1, 0].scatter(t, data['x'][t, which_plots[1]], color=colors['reds'][t - GO_START_2], linewidth=10)
+            axs[0, 0].scatter(t, data['x'][t, which_plots[0]], color=colors['greens'][t - OUT_END_1], linewidth=12)
 
 
-    red_patch = mpatches.Patch(color=colors['reds'][-1], label='go signal times')
+    # red_patch = mpatches.Patch(color=colors['reds'][-1], label='go signal times')
     purple_patch = mpatches.Patch(color=colors['purples'][-1], label='cue times')
     green_patch = mpatches.Patch(color=colors['greens'][-1], label='response times')
+    orange_patch = mpatches.Patch(color=colors['oranges'][-2], label='cue -> go')
 
-    plt.legend(handles=[purple_patch, red_patch, green_patch], bbox_to_anchor=[1, 1])
+    plt.legend(handles=[purple_patch, green_patch, orange_patch], bbox_to_anchor=[1, 1])
 
     axs[0, 1].set_title('Non-linearity', fontsize = 15)
     axs[1, 1].set_title('Colors from light to dark represent time points'.format(which_plots[1]), fontsize = 15)
@@ -120,6 +139,8 @@ def plot_params_af_in_time_one_neuron(params_file):
     axs[0, 1].tick_params(width=3)
     axs[1, 0].tick_params(width=3)
     axs[1, 1].tick_params(width=3)
+
+    plt.tight_layout()
 
     plt.show()
     return
@@ -394,14 +415,14 @@ def plot_af_additive_neurons(params_file, which_from_batch=None):
             #     plt.title('neuron {}; recovered times slot'.format(i))
             for t in range(time_points):
                 if t < CUE_START_TIME:
-                    plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[t], 1, 1),
+                    plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[0,t], 1, 1),
                              color=colors['greys'][t])
 
                 if CUE_START_TIME <= t < when_go_signal:
-                    plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[t], 1, 1), color=colors['reds'][t])
+                    plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[0,t], 1, 1), color=colors['reds'][t])
 
                 if t >= when_go_signal:
-                    plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[t], 1, 1),
+                    plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[0,t], 1, 1),
                              color=colors['greens'][t])
 
             grey_patch = mpatches.Patch(color='grey', label='before cue')
@@ -410,7 +431,67 @@ def plot_af_additive_neurons(params_file, which_from_batch=None):
 
             plt.xlabel('z')
             plt.ylabel('gamma(z;g)')
-            plt.legend(handles=[grey_patch, red_patch, green_patch], bbox_to_anchor=[0.5, 1])
+            plt.legend(handles=[grey_patch, red_patch, green_patch])
             plt.show()
+
+    return
+
+
+def plot_af_separate_neurons_factorial(params_file, which_from_batch=None):
+
+    data = io.loadmat(params_file, struct_as_record=False, squeeze_me = True)
+    # data has keys like 'neuron0-g', 'neuron1-g'. We want to plot the non-linearities for each neurno
+    n_t_samples, time_points, batch_size = data['neuron0-g'].shape
+
+    go_signal_moments = data['go_signal_moments']
+
+    if which_from_batch is None:
+        which_from_batch = np.random.randint(batch_size)
+
+    when_go_signal = go_signal_moments[which_from_batch]
+
+    x_range_af = np.linspace(-0.5, 1.5, time_points)
+
+    colors = {
+        'greys': plt.cm.Greys(np.linspace(0.1, 1, int(time_points))),
+        'reds': plt.cm.Reds(np.linspace(0.5, 1, int(time_points))),
+        'greens': plt.cm.Greens(np.linspace(0.1, 1, int(time_points))),
+    }
+
+    from src.data.create_input_output_factorial import INPUT_SIZE, CUE_TIME
+
+    # fig, ax = plt.subplots(nrows=INPUT_SIZE, sharex=True, figsize=(12, 20), gridspec_kw={'hspace': 0})
+    # fig.tight_layout()
+    for i in range(INPUT_SIZE):
+        neuron_g = data['neuron'+str(i)+'-g'][-1,:,which_from_batch]
+        fig, ax = plt.subplots(1,1)
+        plt.title('neuron {}'.format(i), fontsize = 15)
+        for t in range(time_points):
+            if t < CUE_TIME:
+                plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[0,t],1,1), color=colors['greys'][t], alpha=0.6, linewidth = 3)
+
+            if CUE_TIME <= t < when_go_signal:
+                plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[0,t], 1, 1), color=colors['reds'][t], alpha=0.6, linewidth = 3)
+
+            if t >= when_go_signal:
+                plt.plot(x_range_af, activation_Function(x_range_af, neuron_g[0,t], 1, 1), color=colors['greens'][t], alpha=0.6, linewidth = 3)
+
+        grey_patch = mpatches.Patch(color='grey', label='before cue')
+        red_patch = mpatches.Patch(color='red', label='between cue and go')
+        green_patch = mpatches.Patch(color='green', label='after go')
+
+        plt.xlabel('z', fontsize = 15)
+        plt.ylabel('gamma(z;g)', fontsize = 15)
+        plt.legend(handles=[grey_patch, red_patch, green_patch], bbox_to_anchor=[0.5, 1])
+        ax.spines[['right', 'top']].set_visible(False)
+        for axis in ['bottom', 'left']:
+            ax.spines[axis].set_linewidth(4)
+        # increase tick width
+        ax.tick_params(width=4)
+        plt.tight_layout()
+        plt.show()
+        plt.show()
+
+
 
     return

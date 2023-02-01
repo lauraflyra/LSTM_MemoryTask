@@ -4,8 +4,19 @@ import torch
 import matplotlib.pyplot as plt
 from src.visualization.plot_activation_function_additive import activation_Function
 import matplotlib.patches as mpatches
+from src.data.common_vars import DATA_PATH
+import matplotlib.colors as mcolors
 
-model = torch.load("/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/model_additive_more_dimensions_neurons.pt")
+"""
+This script is made to run a save model with test data. Test data is created within src.data.create_test_data_additive.py
+The goal was to check if the go signal times had impact in the trained model performance.
+"""
+
+
+PATH_RESULTS_ADDITIVE = os.path.join(DATA_PATH, "additive")
+params_file = os.path.join(PATH_RESULTS_ADDITIVE, "params_additive_all_neurons_separate_linear.mat.mat")
+model_file = os.path.join(PATH_RESULTS_ADDITIVE, "model_additive_all_neurons_separate_linear.pt")
+model = torch.load(model_file)
 out_test, model_variables = model(torch.from_numpy(x_test).float())
 SAVE_DATA_PATH = "/home/lauraflyra/Documents/SHK_SprekelerLab/LSTM_computations/LSTM_MemoryTask/src/data/params_model_additive_more_dimensions_neurons_test"
 
@@ -16,6 +27,8 @@ def plot_result_test_additive(x_test, y_test, out_test):
     spacing_x = np.arange(0, input_size, 1)
 
     time_array = np.arange(0, tot_time_steps, 1)
+
+    colors = list(mcolors.TABLEAU_COLORS.keys())
 
     for i in range(batch_size):
         x_plot = x_test[:, i, :] + spacing_x
@@ -34,7 +47,8 @@ def plot_result_test_additive(x_test, y_test, out_test):
         plt.savefig(os.path.join(SAVE_DATA_PATH, name))
         plt.show()
 
-        plt.plot(time_array, output_plot, color = 'blue', linewidth = 3)
+        for person_idx in range(4):
+            plt.plot(time_array, output_plot, color = colors[person_idx], linewidth = 3)
         plt.plot(time_array, out_pred_plot, color ='black', alpha=0.6, label = 'predicted')
         plt.title("output test batch n {}".format(i))
 
