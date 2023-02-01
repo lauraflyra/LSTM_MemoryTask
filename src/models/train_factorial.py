@@ -12,25 +12,9 @@ dataset = (torch.from_numpy(x).float(), torch.from_numpy(y).float(), go_signal_t
 model = NetworkFactorial()
 dict_results_factorial = train(dataset,
                                model,
-                               n_epochs=110,
+                               n_epochs=1510,
                                data_path=PATH_RESULTS_FACTORIAL,
                                save_params_name=os.path.join(PATH_RESULTS_FACTORIAL, "params_factorial.mat"),
                                save_model_name=os.path.join(PATH_RESULTS_FACTORIAL, "model_factorial.pt"),
                                checkpoints_file_name="model_checkpoints_factorial")
 
-#
-# if __name__ == "__main__":
-#     x = create_input(batch_size=100)
-#     x, go_signal_idx, go_signal_moments = create_go_signal(x)
-#     output = create_output(x, go_signal_idx, go_signal_moments)
-#
-#     dataset = (torch.from_numpy(x).float(), torch.from_numpy(output).float())
-#     model = NetworkFactorial()
-#     x, output, out_pred, train_error = train(dataset, model, n_epochs=610, saveParams=True,
-#                 saveParamsName=os.path.join(DATA_PATH, "params_factorial_all_neurons_same_linear.mat"))
-#
-#     which_from_batch = plot_result_training_factorial(x, output, out_pred.detach().numpy(), train_error, n_epochs = 610, plot_every=100,
-#                                                             title="Batch size = 100, n_epochs = 610")
-#
-#     plot_AF_separate_neurons(params_file=os.path.join(DATA_PATH, "params_factorial_all_neurons_same_linear.mat"), go_signal_idx=go_signal_idx,
-#             go_signal_moments=go_signal_moments, which_from_batch=which_from_batch)

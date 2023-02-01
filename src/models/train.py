@@ -4,6 +4,11 @@ from src.data.common_vars import DATA_PATH
 from scipy import io
 import os
 
+"""
+Define train function that can be used with all models implemented here. 
+Loss function is MSE and optimizer is Adam. 
+"""
+
 
 def train(dataset,
           model,
