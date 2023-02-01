@@ -5,7 +5,8 @@ import numpy as np
 """
 Activation function used:
 gamma(x; g, theta, alpha) = g * log(1+exp(alpha*(x-theta)))/alpha
-where g is the gain, theta is threshold, alpha is the softening parameter. Only the gain is learned by the LSTM. 
+where g is the gain, theta is threshold, alpha is the softening parameter. Only the gain is learned by the LSTM.
+alpha and theta are fixed to 1 here.
 """
 
 
@@ -15,10 +16,12 @@ class NetworkAdditive(nn.Module):
     Create a network where each neuron is has its inner chemistry represented by an LSTM.
     All neurons are the same, i.e, they have the same inner chemistry mechanisms, therefore the same LSTM.
     All neurons are independent from one another.
-    Each neuron receives a 1d time series. Neurons are grouped such that each neuron can represent a person within a time slot.
-    At some random point, we send the neurons correspondent to the queried time slot a cue signal, indicating we want that neuron
-    to respond to whether there was an input or not, leading to a one hot encoded output.
-    We expect the neuron to have an output in 1 hot encoding for the person that had the slot in the queried time.
+    Here we have number of neurons as a parameter.
+    The idea is that the input is one hot encoding of people + one hot encoding of time. A linear layer takes this input
+    and gives it to each neuron, inside each neuron, an LSTM computed the gain, and the output of the neuron is put
+    through the AF that also takes the gain as parameter. A linear mapping from neurons to output is made in the last layer.
+    Output is one hot encoding of people, given the input for that time step.
+
     """
 
     def __init__(self, hidden_size_LSTM=64, input_lstm_dim = 1, number_neurons = 20):
@@ -40,16 +43,10 @@ class NetworkAdditive(nn.Module):
         self.neurons2output = nn.Linear(self.n_neurons, len(PEOPLE))
 
 
-        # # create neurons
-        # self.neurons_input2hidden = nn.ModuleDict()
-        # self.neurons_hidden2out = nn.ModuleDict()
-
         # create dictionary to save hidden states and g for all neurons
         self.neuron_variables = {}
 
         for neuron_number in range(self.n_neurons):
-            # self.neurons_input2hidden["neuron{0}".format(neuron_number)] = nn.Linear(INPUT_DIM, input_lstm_dim)
-            # self.neurons_hidden2out["neuron{0}".format(neuron_number)] = nn.Linear(10, input_lstm_dim)
             self.neuron_variables["neuron{0}".format(neuron_number)] = {}
 
     def forward(self, input):
@@ -72,7 +69,6 @@ class NetworkAdditive(nn.Module):
         for i in range(n_timepoints):
             input2neuron = self.linear2neurons(input[i,:,:])
             for neuron_number in range(self.n_neurons):
-                # outLin = self.neurons_input2hidden["neuron{0}".format(neuron_number)](input[i,:,:])
                 neuron_input = input2neuron[:,neuron_number].reshape(-1,1)
                 self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] = self.lstm(neuron_input,
                                                     self.neuron_variables["neuron{0}".format(neuron_number)]["hiddenLSTM"] )

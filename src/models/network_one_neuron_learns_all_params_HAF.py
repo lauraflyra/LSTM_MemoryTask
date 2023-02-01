@@ -6,6 +6,8 @@ import torch.nn as nn
 Activation Function:
 gamma(x; g, theta, alpha) = g * log(1+exp(alpha*(x-theta)))/alpha
 where g is the gain, theta is threshold, alpha is the softening parameter.  
+The difference from this and network_one_neuron, is that alpha and theta are also learned by the Network.
+HAF stands for Henning Activation Function, because it was proposed by him :)
 """
 
 

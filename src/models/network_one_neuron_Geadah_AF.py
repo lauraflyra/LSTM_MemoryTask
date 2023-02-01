@@ -1,6 +1,10 @@
 import torch
 import torch.nn as nn
 
+"""
+First try of network had the activation function from 
+'Advantages of biologically-inspired adaptive neural activation in RNNs during learning' Geadah et. al
+"""
 
 
 class NetworkOneNeuronGeadah(nn.Module):
