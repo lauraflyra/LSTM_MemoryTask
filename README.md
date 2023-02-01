@@ -104,7 +104,7 @@ with the following input/output patterns:
 
 ```
 
-In the folder src/data, you can find the scripts that are used in order to create input and output data. Each model has 
+In the folder ```src/data```, you can find the scripts that are used in order to create input and output data. Each model has 
 their own specific script, plus there are scripts for generating test data for the additive and factorial networks. 
 
 Test data here are only 3 different input/output pairs, that were selected such that we could observe different go 
