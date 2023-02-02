@@ -13,7 +13,7 @@ The LSTM regulates the neurons activation function, which is represented by:
 
 gamma(x; g, theta, alpha) = g * log(1+exp(alpha*(x-theta)))/alpha
 
-LSTM can lean g, the gain, theta, the threshold, and alpha, the softnening parameter.
+LSTM can learn g, the gain, theta, the threshold, and alpha, the softnening parameter.
 
 The files:
 
